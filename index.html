@@ -268,6 +268,11 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
                font:inherit;font-size:20px;font-weight:700;text-align:center}
 .modal-a{display:flex;gap:8px;margin-top:12px}
 .modal-a .btn{flex:1}
+.modal-c.ancha{max-width:390px;max-height:88vh;overflow-y:auto}
+.modal-c.ancha .btn{margin-top:10px}
+.ej{background:#fbf8f5;border:1px dashed var(--line);border-radius:9px;padding:8px 10px;margin-top:6px;
+    font:600 12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--muted);
+    white-space:pre;overflow-x:auto}
 </style>
 </head>
 <body data-pane="list" data-tab="rollizo">
@@ -352,6 +357,18 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
 </main>
 </div>
 
+<div class="modal" id="hoja" hidden>
+  <div class="modal-c ancha">
+    <div class="modal-t">Copiar pedido</div>
+    <div class="modal-s">Elegí cómo se arma el texto</div>
+    <button class="btn wide" data-fmt="simple">Lista simple</button>
+    <pre class="ej" id="ejSimple"></pre>
+    <button class="btn wide" data-fmt="grupo">Agrupado por medida</button>
+    <pre class="ej" id="ejGrupo"></pre>
+    <button class="btn ghost wide" id="hojaCancel">Cancelar</button>
+  </div>
+</div>
+
 <div class="modal" id="modal" hidden>
   <div class="modal-c">
     <div class="modal-t" id="mTit">Otro valor</div>
@@ -372,7 +389,7 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
    cambios grandes (4.0).
    ESTE MISMO NÚMERO va en el VERSION de sw.js. Uno solo, dos archivos.
    ============================================================ */
-var APP_VER="3.0";
+var APP_VER="3.2";
 
 /* ============================================================
    FÓRMULAS
@@ -482,17 +499,14 @@ function setPane(p){ document.body.dataset.pane=p; }
 
 /* ---------- helpers ---------- */
 function num(v){var n=parseFloat((""+v).replace(",",".").trim());return isFinite(n)?n:0;}
-/* "120.000,50" -> 120000.5   "0.35" -> 0.35   "18.000" -> 18000
-   Si hay coma, manda la coma como decimal. Si solo hay puntos, son miles
-   salvo que el último grupo no tenga 3 dígitos (ahí el punto es decimal). */
+/* Lector de los campos de IMPORTE, que autoMiles va formateando mientras tipeás.
+   Ahí los puntos los pone la propia app como separador de miles, así que se
+   descartan siempre; el decimal es la coma. "120.000,50" -> 120000.5
+   (Los campos decimales chicos, como el rinde de la bolsa, usan num(), que
+   acepta tanto coma como punto.) */
 function numAR(v){
-  var s=(""+v).replace(/[^\d,.-]/g,""), p;
-  if(s.indexOf(",")>=0){ s=s.replace(/\./g,"").replace(",","."); }
-  else{
-    p=s.split(".");
-    s = (p.length>1 && p[p.length-1].length!==3) ? p.slice(0,-1).join("")+"."+p[p.length-1] : p.join("");
-  }
-  var n=parseFloat(s); return isFinite(n)?n:0;
+  var n=parseFloat((""+v).replace(/[^\d,.-]/g,"").replace(/\./g,"").replace(",","."));
+  return isFinite(n)?n:0;
 }
 function miles(n){return n.toLocaleString("es-AR",{maximumFractionDigits:2});}
 function autoMiles(el){
@@ -1129,11 +1143,24 @@ function renderCfg(){
 /* ============================================================
    COPIAR / ENVIAR EL PEDIDO
    ============================================================ */
+function unidadTxt(u){ return u==="pie²"?"pie2":u==="m³"?"m3":u; }
+function encabezado(c){
+  var T=TIPOS[c.tipo];
+  return [(c.titulo||c.codigo||"").trim(),
+          T.n+(T.madera?" · "+(c.maderaNombre||(madera(c.maderaId)||{}).nombre||""):"")];
+}
+function cierre(c){
+  var T=TIPOS[c.tipo], L=[], imp=importeCuenta(c);
+  L.push("Total: "+fmt(totalCuenta(c),T.dec)+" "+unidadTxt(T.u));
+  var B=(c.tipo==="celulosa")?bolsasDe(c):null;
+  if(B) L.push("Bolsas: "+miles(B.bolsas)+(B.precio>0?"  ("+money(B.costo)+")":""));
+  if(imp>0) L.push("Importe: "+money(imp));
+  return L;
+}
+
+/* ---- formato 1: una línea por renglón cargado ---- */
 function textoPedido(c){
-  var T=TIPOS[c.tipo], t=totalCuenta(c), imp=importeCuenta(c), L=[];
-  L.push((c.titulo||c.codigo||"").trim());
-  L.push(T.n+(T.madera?" · "+(c.maderaNombre||(madera(c.maderaId)||{}).nombre||""):""));
-  L.push("");
+  var L=encabezado(c); L.push("");
   (c.lineas||[]).forEach(function(l){
     var s;
     if(c.tipo==="rollizo")        s=fmt(l.d1,0)+"/"+fmt(l.d2,0)+" cm x "+fmt(l.L,2)+" m x "+miles(l.cant||1)+" u";
@@ -1143,11 +1170,46 @@ function textoPedido(c){
     L.push(s);
   });
   L.push("");
-  L.push("Total: "+fmt(t,T.dec)+" "+(T.u==="pie²"?"pie2":T.u==="m³"?"m3":T.u));
-  var B=(c.tipo==="celulosa")?bolsasDe(c):null;
-  if(B) L.push("Bolsas: "+miles(B.bolsas)+(B.precio>0?"  ("+money(B.costo)+")":""));
-  if(imp>0) L.push("Importe: "+money(imp));
-  return L.join("\n");
+  return L.concat(cierre(c)).join("\n");
+}
+
+/* ---- formato 2: agrupado por medida, con subtotal de cada grupo ---- */
+function textoPedidoAgrupado(c){
+  var L=encabezado(c); L.push("");
+  var uni=(c.tipo==="celulosa")?"m2":"u", grupos={}, orden=[];
+  (c.lineas||[]).forEach(function(l){
+    var g,ord,det,cant;
+    if(c.tipo==="rollizo"){
+      g=fmt(l.d1,0)+"/"+fmt(l.d2,0)+" cm"; ord=[l.d1,l.d2];
+      det=fmt(l.L,2)+" m"; cant=l.cant||1;
+    }else if(c.tipo==="escuadria"){
+      g=fmt(l.alto,0)+'" x '+fmt(l.ancho,0)+'"'; ord=[l.alto,l.ancho];
+      det=fmt(l.L,2)+" m"; cant=l.cant||1;
+    }else{
+      g=fmt(l.esp,0)+'"'; ord=[l.esp,0];
+      det=null; cant=l.m2;
+    }
+    if(!grupos[g]){ grupos[g]={ord:ord,tot:0,items:{},lista:[]}; orden.push(g); }
+    var G=grupos[g], k=(det||"")+"|"+(l.desc||"");
+    if(!G.items[k]){ G.items[k]={det:det,desc:l.desc||"",cant:0,ord:det?l.L:cant}; G.lista.push(k); }
+    G.items[k].cant+=cant; G.tot+=cant;
+  });
+  orden.sort(function(a,b){
+    return (grupos[a].ord[0]-grupos[b].ord[0]) || (grupos[a].ord[1]-grupos[b].ord[1]);
+  });
+  orden.forEach(function(g){
+    var G=grupos[g];
+    L.push(g+" :   tot "+miles(G.tot)+" "+uni);
+    G.lista.map(function(k){return G.items[k];})
+      .sort(function(a,b){return a.ord-b.ord;})
+      .forEach(function(it){
+        var s="   "+(it.det?it.det+"  -  "+miles(it.cant)+" "+uni:miles(it.cant)+" "+uni);
+        if(it.desc) s+="  -  "+it.desc;
+        L.push(s);
+      });
+  });
+  L.push("");
+  return L.concat(cierre(c)).join("\n");
 }
 function toast(msg){
   var t=document.createElement("div"); t.className="toast"; t.textContent=msg;
@@ -1169,17 +1231,34 @@ function alPortapapeles(txt){
     navigator.clipboard.writeText(txt).then(function(){ toast("Pedido copiado"); },viejo);
   }else viejo();
 }
-function copiarPedido(){
-  var c=cuenta(); if(!c) return;
-  if(!(c.lineas||[]).length){ toast("La cuenta no tiene líneas"); return; }
-  var txt=textoPedido(c);
+function enviarTexto(txt){
   if(navigator.share){
     navigator.share({text:txt}).catch(function(e){
       if(!e||e.name!=="AbortError") alPortapapeles(txt);   // si cancelaste, no hago nada
     });
   }else alPortapapeles(txt);
 }
-document.getElementById("btnCopy").onclick=copiarPedido;
+/* muestra de las primeras líneas, para elegir el formato viendo cómo queda */
+function muestra(txt,n){
+  var l=txt.split("\n").slice(2).filter(function(x){return x!=="";});
+  var corte=l.slice(0,n);
+  return corte.join("\n")+(l.length>n?"\n…":"");
+}
+document.getElementById("btnCopy").onclick=function(){
+  var c=cuenta(); if(!c) return;
+  if(!(c.lineas||[]).length){ toast("La cuenta no tiene líneas"); return; }
+  document.getElementById("ejSimple").textContent=muestra(textoPedido(c),3);
+  document.getElementById("ejGrupo").textContent=muestra(textoPedidoAgrupado(c),5);
+  document.getElementById("hoja").hidden=false;
+};
+document.getElementById("hojaCancel").onclick=function(){ document.getElementById("hoja").hidden=true; };
+document.getElementById("hoja").onclick=function(ev){
+  if(ev.target===this){ this.hidden=true; return; }        // tocar afuera cierra
+  var b=ev.target.closest("[data-fmt]"); if(!b) return;
+  var c=cuenta(); if(!c) return;
+  this.hidden=true;
+  enviarTexto(b.dataset.fmt==="grupo"?textoPedidoAgrupado(c):textoPedido(c));
+};
 
 document.getElementById("btnCfg").onclick=function(){
   var p=document.getElementById("cfgPanel"); p.hidden=!p.hidden;
