@@ -2,8 +2,9 @@
    Guarda una copia de la app en el teléfono para que abra sin internet.
    Estrategia: sirve primero desde el caché (instantáneo) y, si hay red,
    baja la versión nueva en segundo plano para la próxima vez.
-   Al cambiar la app, subir este archivo con VERSION+1. */
-const VERSION = 2;
+   VERSION tiene que ser SIEMPRE el mismo número que APP_VER en index.html:
+   el que se ve arriba a la derecha del título. */
+const VERSION = "3.0";
 const CACHE = "materiales-v" + VERSION;
 const ARCHIVOS = [
   "./",

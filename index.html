@@ -19,15 +19,19 @@
   --accent-soft:#f0e4d6; --line:#e2d9cf; --ok:#2f7a4f; --danger:#b5423a;
   --r:12px; --safe-b:env(safe-area-inset-bottom,0px);
 }
-html,body{height:100%}
+html,body{height:100%;overflow:hidden}
 body{font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
      background:var(--bg);color:var(--ink);overscroll-behavior:none}
-.app{display:flex;flex-direction:column;height:100dvh;max-width:1100px;margin:0 auto}
+/* 100vh primero como respaldo: si el navegador no entiende dvh, igual queda a pantalla */
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh;
+     max-height:100vh;max-height:100dvh;max-width:1100px;margin:0 auto;overflow:hidden}
 
 /* ============ header ============ */
 header{background:var(--accent);color:#fff;padding:8px 10px;padding-top:calc(8px + env(safe-area-inset-top,0px))}
 .brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:17.5px;margin-bottom:8px}
 .brand small{font-weight:400;opacity:.75;font-size:13px}
+.ver{margin-left:auto;font-size:13px;font-weight:600;opacity:.65;letter-spacing:.4px;
+     white-space:nowrap;font-variant-numeric:tabular-nums}
 .tabs{display:flex;gap:4px;align-items:stretch}
 .tab{flex:1;padding:8px 3px;border:0;border-radius:9px;background:rgba(255,255,255,.16);color:#fff;
      font:inherit;font-weight:700;font-size:14px;cursor:pointer;min-width:0}
@@ -41,12 +45,13 @@ header{background:var(--accent);color:#fff;padding:8px 10px;padding-top:calc(8px
 }
 
 /* ============ layout ============ */
-main{flex:1;display:grid;grid-template-columns:290px 1fr;gap:12px;padding:12px;overflow:hidden}
+main{flex:1 1 0;min-height:0;display:grid;grid-template-columns:290px 1fr;gap:12px;padding:12px;overflow:hidden}
 .pane{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
       display:flex;flex-direction:column;overflow:hidden;min-height:0}
-.pane-hd{padding:6px 8px 6px 12px;border-bottom:1px solid var(--line);font-weight:700;font-size:15.5px;
-         background:#fbf8f5;display:flex;align-items:center;justify-content:space-between;gap:8px}
-.pane-bd{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0}
+.pane-hd{flex:none;padding:6px 8px 6px 12px;border-bottom:1px solid var(--line);font-weight:700;
+         font-size:15.5px;background:#fbf8f5;display:flex;align-items:center;
+         justify-content:space-between;gap:8px}
+.pane-bd{flex:1 1 0;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0}
 #config{display:none}
 body[data-tab="config"] main{grid-template-columns:1fr}
 body[data-tab="config"] #lista,body[data-tab="config"] #editor{display:none}
@@ -67,8 +72,9 @@ button{font:inherit}
 .btn.danger{background:transparent;color:var(--danger);border:1px solid #eccfcc}
 .btn.wide{width:100%}
 .btn:disabled{opacity:.4}
-.bar{padding:8px 10px;border-top:1px solid var(--line);background:#fbf8f5;display:flex;gap:8px}
-.bar>.btn{flex:1}
+.bar{flex:none;padding:8px 10px;padding-bottom:calc(8px + var(--safe-b));
+     border-top:1px solid var(--line);background:#fbf8f5;display:flex;gap:8px}
+.bar>.btn{flex:1;min-width:0;white-space:nowrap}
 .icobtn{border:1px solid var(--line);background:#fff;color:var(--accent);border-radius:8px;
         padding:5px 9px;font-size:16px;line-height:1.2;cursor:pointer;flex:none}
 .icobtn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
@@ -88,7 +94,7 @@ button{font:inherit}
 .empty{padding:26px 16px;text-align:center;color:var(--muted);font-size:15.5px;line-height:1.6}
 
 /* ============ editor: renglón título + madera ============ */
-.madrow{display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--accent-soft);
+.madrow{flex:none;display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--accent-soft);
         border-bottom:1px solid var(--line)}
 .madrow #inTitulo{flex:1 1 56%;min-width:0;border:1px solid #d8c6ae;border-radius:8px;padding:8px;
       font:inherit;font-size:16px;font-weight:700;background:#fff;color:var(--ink)}
@@ -156,7 +162,10 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
 .lin-x{border:0;background:transparent;color:var(--danger);font-size:21px;line-height:1;padding:2px 4px;cursor:pointer;flex:none}
 
 /* ============ totales ============ */
-.tot{border-top:2px solid var(--accent);background:#fff;padding:9px 12px;padding-bottom:calc(9px + var(--safe-b))}
+/* el bloque de totales nunca se come la pantalla: se topa y scrollea adentro */
+.tot{flex:0 1 auto;border-top:2px solid var(--accent);background:#fff;padding:9px 12px;
+     padding-bottom:calc(9px + var(--safe-b));max-height:58%;overflow-y:auto;
+     -webkit-overflow-scrolling:touch}
 .tot-r{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .tot-r+.tot-r{margin-top:4px}
 .tot-k{font-size:14px;color:var(--muted);font-weight:600;flex:1;min-width:0}
@@ -265,7 +274,7 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
 <div class="app">
 
 <header>
-  <div class="brand">🪵 Calculadora de materiales</div>
+  <div class="brand">🪵 Calculadora de materiales <span class="ver" id="appVer"></span></div>
   <div class="tabs">
     <button class="tab on" data-tab="rollizo">Rollizos <span>m³</span></button>
     <button class="tab" data-tab="escuadria">Tirantes <span>pie²</span></button>
@@ -357,6 +366,14 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
 
 <script>
 "use strict";
+/* ============================================================
+   VERSIÓN — se muestra a la derecha del título y en Config → Respaldo.
+   Decimal para retoques y correcciones (3.1, 3.2…), entero para
+   cambios grandes (4.0).
+   ESTE MISMO NÚMERO va en el VERSION de sw.js. Uno solo, dos archivos.
+   ============================================================ */
+var APP_VER="3.0";
+
 /* ============================================================
    FÓRMULAS
    ROLLIZOS (m³)  d1,d2 en cm ; L en m
@@ -815,6 +832,7 @@ function renderDatos(){
   var ur=DB.ultimoRespaldo, dias=ur?Math.floor((Date.now()-new Date(ur))/86400000):null;
   document.getElementById("datosBd").innerHTML=
      '<div class="mad">'
+    +'<div class="kv"><span>Versión de la app</span><b>v '+APP_VER+'</b></div>'
     +'<div class="kv"><span>Cuentas guardadas</span><b>'+miles(n)+'</b></div>'
     +'<div class="kv"><span>'+por+'</span><b></b></div>'
     +'<div class="kv"><span>Tamaño de los datos</span><b>'+fmt(kb,1)+' KB</b></div>'
@@ -1321,8 +1339,13 @@ function renderTot(){
   document.querySelectorAll("#totBox .aviso-a .btn").forEach(function(b){
     b.onclick=function(){ cargarPrecioEspesor(c,+b.dataset.esp); };
   });
-  var mi=document.getElementById("masinfo");
-  if(mi) mi.ontoggle=function(){ c.verInfo=mi.open; save(); };   // recuerda si lo dejaste abierto
+  var mi=document.getElementById("masinfo"), tb=document.getElementById("totBox");
+  if(mi) mi.ontoggle=function(){
+    c.verInfo=mi.open; save();
+    /* al abrirlo, traigo lo que se desplegó a la vista */
+    if(mi.open) setTimeout(function(){ tb.scrollTop=tb.scrollHeight; },30);
+  };
+  if(c.verInfo&&mi) setTimeout(function(){ tb.scrollTop=tb.scrollHeight; },30);
   /* tocar «precio desactualizado» abre el ⚙ para actualizar ese bloque */
   document.querySelectorAll("#totBox [data-abrircfg]").forEach(function(b){
     b.onclick=function(){
@@ -1417,6 +1440,7 @@ window.addEventListener("resize",function(){ if(!esMobile()&&tab!=="config"&&act
   ].forEach(function(t){console.log((ok(t[1],t[2])?"OK  ":"FAIL")+"  "+t[0]+" = "+t[1].toFixed(4));});
 })();
 
+document.getElementById("appVer").textContent="v "+APP_VER;
 save();
 if(!esMobile()) setPane("editor");
 renderLista(); renderEditor(); renderConfig();
