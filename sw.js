@@ -4,7 +4,7 @@
    baja la versión nueva en segundo plano para la próxima vez.
    VERSION tiene que ser SIEMPRE el mismo número que APP_VER en index.html:
    el que se ve arriba a la derecha del título. */
-const VERSION = "3.2";
+const VERSION = "3.4";
 const CACHE = "materiales-v" + VERSION;
 const ARCHIVOS = [
   "./",
