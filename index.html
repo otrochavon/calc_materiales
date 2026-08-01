@@ -12,6 +12,8 @@
 <title>Calculadora de materiales</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+/* el atributo hidden gana siempre: si no, reglas como .bar{display:flex} lo pisan */
+[hidden]{display:none!important}
 :root{
   --bg:#f5f1ec; --card:#fff; --ink:#2a221d; --muted:#8a7a6e; --accent:#7a4f24;
   --accent-soft:#f0e4d6; --line:#e2d9cf; --ok:#2f7a4f; --danger:#b5423a;

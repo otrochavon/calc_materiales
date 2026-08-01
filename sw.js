@@ -3,7 +3,7 @@
    Estrategia: sirve primero desde el caché (instantáneo) y, si hay red,
    baja la versión nueva en segundo plano para la próxima vez.
    Al cambiar la app, subir este archivo con VERSION+1. */
-const VERSION = 1;
+const VERSION = 2;
 const CACHE = "materiales-v" + VERSION;
 const ARCHIVOS = [
   "./",
