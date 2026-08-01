@@ -30,8 +30,14 @@ body{font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-seri
 header{background:var(--accent);color:#fff;padding:8px 10px;padding-top:calc(8px + env(safe-area-inset-top,0px))}
 .brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:17.5px;margin-bottom:8px}
 .brand small{font-weight:400;opacity:.75;font-size:13px}
-.ver{margin-left:auto;font-size:13px;font-weight:600;opacity:.65;letter-spacing:.4px;
-     white-space:nowrap;font-variant-numeric:tabular-nums}
+/* el número de versión es el botón de actualizar */
+.ver{margin-left:auto;flex:none;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.14);
+     color:#fff;border-radius:20px;padding:4px 11px;font:inherit;font-size:13px;font-weight:700;
+     letter-spacing:.4px;white-space:nowrap;cursor:pointer;font-variant-numeric:tabular-nums}
+.ver:active{background:#fff;color:var(--accent)}
+.verchip{border:1px solid var(--line);background:#fff;color:var(--accent);border-radius:20px;
+         padding:3px 11px;font:inherit;font-size:14px;font-weight:800;cursor:pointer}
+.verchip:active{background:var(--accent);color:#fff}
 .tabs{display:flex;gap:4px;align-items:stretch}
 .tab{flex:1;padding:8px 3px;border:0;border-radius:9px;background:rgba(255,255,255,.16);color:#fff;
      font:inherit;font-weight:700;font-size:14px;cursor:pointer;min-width:0}
@@ -289,7 +295,8 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
 <div class="app">
 
 <header>
-  <div class="brand">🪵 Calculadora de materiales <span class="ver" id="appVer"></span></div>
+  <div class="brand">🪵 Calculadora de materiales
+    <button class="ver" id="appVer" title="Tocar para buscar actualización"></button></div>
   <div class="tabs">
     <button class="tab on" data-tab="rollizo">Rollizos <span>m³</span></button>
     <button class="tab" data-tab="escuadria">Tirantes <span>pie²</span></button>
@@ -400,7 +407,7 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
    cambios grandes (4.0).
    ESTE MISMO NÚMERO va en el VERSION de sw.js. Uno solo, dos archivos.
    ============================================================ */
-var APP_VER="3.4";
+var APP_VER="3.5";
 
 /* ============================================================
    FÓRMULAS
@@ -783,6 +790,30 @@ function renderDolar(){
 /* ============================================================
    CONFIG — respaldo: exportar / restaurar / fusionar
    ============================================================ */
+/* Tocar el número de versión tira la copia guardada de la app y la baja de nuevo.
+   No toca localStorage: las cuentas, precios y config quedan intactos. */
+function buscarActualizacion(){
+  if(!confirm("Versión instalada: v "+APP_VER+"\n\nVa a borrar la copia guardada de la app y bajarla de nuevo del servidor.\nTus cuentas y precios NO se tocan.\n\nNecesitás señal. ¿Seguir?")) return;
+  toast("Buscando actualización…");
+  var pasos=[];
+  if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations){
+    pasos.push(navigator.serviceWorker.getRegistrations().then(function(rs){
+      return Promise.all(rs.map(function(r){ return r.unregister(); }));
+    }).catch(function(){}));
+  }
+  if(window.caches&&caches.keys){
+    pasos.push(caches.keys().then(function(ks){
+      return Promise.all(ks.map(function(k){ return caches.delete(k); }));
+    }).catch(function(){}));
+  }
+  Promise.all(pasos).then(function(){
+    setTimeout(function(){
+      var u=location.href.split("#")[0].split("?")[0];
+      location.replace(u+"?nueva="+Date.now());     // sin caché ni del navegador ni del CDN
+    },400);
+  });
+}
+
 function nombreRespaldo(){
   var d=new Date(), p=function(x){return ("0"+x).slice(-2);};
   return "materiales-respaldo-"+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+"-"+p(d.getHours())+p(d.getMinutes())+".json";
@@ -865,7 +896,8 @@ function renderDatos(){
   var ur=DB.ultimoRespaldo, dias=ur?Math.floor((Date.now()-new Date(ur))/86400000):null;
   document.getElementById("datosBd").innerHTML=
      '<div class="mad">'
-    +'<div class="kv"><span>Versión de la app</span><b>v '+APP_VER+'</b></div>'
+    +'<div class="kv"><span>Versión de la app · tocá para actualizar</span>'
+      +'<button class="verchip" id="verChip">v '+APP_VER+'</button></div>'
     +'<div class="kv"><span>Cuentas guardadas</span><b>'+miles(n)+'</b></div>'
     +'<div class="kv"><span>'+por+'</span><b></b></div>'
     +'<div class="kv"><span>Tamaño de los datos</span><b>'+fmt(kb,1)+' KB</b></div>'
@@ -880,6 +912,7 @@ function renderDatos(){
     +'<div class="mad"><div class="mad-u">Los datos viven en el navegador de <b>este</b> teléfono. Se pierden si borrás los datos de navegación, cambiás de navegador o de teléfono. '
     +'El respaldo es un archivo <b>.json</b> con todo adentro: cuentas, líneas, precios congelados, maderas, celulosa, dólar y rótulos. '
     +'Guardalo en Drive o mandátelo por WhatsApp y con eso podés recuperar todo o pasarlo a otro teléfono.</div></div>';
+  document.getElementById("verChip").onclick=buscarActualizacion;
   document.getElementById("btnExport").onclick=bajarRespaldo;
   var bs=document.getElementById("btnShare"); if(bs) bs.onclick=compartirRespaldo;
   document.getElementById("btnMerge").onclick=function(){ pedirArchivo("fusionar"); };
@@ -1590,6 +1623,7 @@ window.addEventListener("resize",function(){ if(!esMobile()&&tab!=="config"&&act
 })();
 
 document.getElementById("appVer").textContent="v "+APP_VER;
+document.getElementById("appVer").onclick=buscarActualizacion;
 save();
 if(!esMobile()) setPane("editor");
 renderLista(); renderEditor(); renderConfig();
