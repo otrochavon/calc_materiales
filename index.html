@@ -286,6 +286,21 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
 .modal-a .btn{flex:1}
 .modal-c.ancha{max-width:390px;max-height:88vh;overflow-y:auto}
 .modal-c.ancha .btn{margin-top:10px}
+/* ---- descuento ---- */
+.dmodos{display:flex;gap:6px;margin:12px 0 10px}
+.dm{flex:1;min-width:0;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:9px;
+    padding:10px 4px;font:inherit;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+.dm.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.dprev{margin-top:10px;background:#fbf8f5;border:1px dashed var(--line);border-radius:10px;padding:10px 12px;
+       font-size:14px;line-height:1.7;color:var(--muted)}
+.dprev b{color:var(--ink);font-variant-numeric:tabular-nums}
+.dprev .fin{color:var(--ok);font-size:18px;font-weight:800}
+.dprev .rec{color:var(--danger)}
+.tot-2.clic{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:4px}
+.tot-desc{color:var(--danger);font-weight:700;font-size:17px;font-variant-numeric:tabular-nums}
+.tot-fin{color:var(--ok);font-weight:800;font-size:21px;font-variant-numeric:tabular-nums}
+.acc-desc{display:inline-block;background:#eaf3ec;color:var(--ok);border-radius:6px;padding:0 5px;
+          font-size:11.5px;font-weight:800;margin-right:4px;vertical-align:1px}
 .ej{background:#fbf8f5;border:1px dashed var(--line);border-radius:9px;padding:8px 10px;margin-top:6px;
     font:600 12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--muted);
     white-space:pre;overflow-x:auto}
@@ -375,6 +390,25 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
 </main>
 </div>
 
+<div class="modal" id="hojaDesc" hidden>
+  <div class="modal-c ancha">
+    <div class="modal-t">Descuento sobre la cuenta</div>
+    <div class="modal-s" id="dcSub"></div>
+    <div class="dmodos">
+      <button class="dm" data-modo="pct">% Porcentaje</button>
+      <button class="dm" data-modo="monto">$ Descontar</button>
+      <button class="dm" data-modo="final">= Dejar en</button>
+    </div>
+    <input id="dcIn" inputmode="decimal" autocomplete="off">
+    <div class="dprev" id="dcPrev"></div>
+    <div class="modal-a">
+      <button class="btn danger" id="dcQuitar">Quitar</button>
+      <button class="btn ghost" id="dcCancel">Cancelar</button>
+      <button class="btn" id="dcOk">Aplicar</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="hoja" hidden>
   <div class="modal-c ancha">
     <div class="modal-t">Copiar pedido</div>
@@ -407,7 +441,7 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
    cambios grandes (4.0).
    ESTE MISMO NÚMERO va en el VERSION de sw.js. Uno solo, dos archivos.
    ============================================================ */
-var APP_VER="3.5";
+var APP_VER="3.6";
 
 /* ============================================================
    FÓRMULAS
@@ -629,6 +663,31 @@ function importeCuenta(c){
   (c.lineas||[]).forEach(function(l){ t+=l.m2*num(s[l.esp]); });
   return t;
 }
+/* ---------- descuento sobre el importe de la cuenta ----------
+   modo "pct"   : valor = porcentaje a descontar
+   modo "monto" : valor = pesos a descontar
+   modo "final" : valor = importe en el que tiene que quedar la cuenta
+   Si el ajuste da para arriba se muestra como recargo.                */
+function descuentoDe(c){
+  var d=c.desc; if(!d) return null;
+  var b=importeCuenta(c), v=num(d.valor);
+  if(!(v>0)&&d.modo!=="final") return null;
+  var monto;
+  if(d.modo==="pct")        monto=b*v/100;
+  else if(d.modo==="monto") monto=v;
+  else                      monto=b-v;
+  if(monto>b) monto=b;                          // nunca deja la cuenta en negativo
+  return {modo:d.modo, valor:v, monto:monto, final:b-monto,
+          pct: b>0 ? monto/b*100 : 0, bruto:b};
+}
+function totalACobrar(c){ var D=descuentoDe(c); return D?D.final:importeCuenta(c); }
+function pctTxt(p){ p=Math.round(p*10)/10; return fmt(p,p%1===0?0:1)+"%"; }
+function etiquetaDesc(D){
+  if(D.modo==="pct")   return (D.monto<0?"Recargo ":"Descuento ")+pctTxt(D.valor);
+  if(D.modo==="monto") return (D.monto<0?"Recargo":"Descuento")+" fijo  ("+pctTxt(Math.abs(D.pct))+")";
+  return "Ajustado a "+money0(D.valor)+"  ("+(D.monto<0?"+":"−")+pctTxt(Math.abs(D.pct))+")";
+}
+
 function hayPrecio(c){
   if(c.tipo!=="celulosa") return precioDe(c)>0;
   return importeCuenta(c)>0;
@@ -974,7 +1033,9 @@ function renderLista(){
   if(!todas.length){ box.innerHTML='<div class="empty">Todavía no hay cuentas.<br>Tocá <b>+ Nueva cuenta</b> para empezar.</div>'; return; }
   if(!res.length){ box.innerHTML='<div class="empty">Ninguna cuenta coincide con<br><b>'+esc(filtro)+'</b></div>'; return; }
   box.innerHTML=res.map(function(r){
-    var c=r.c, t=totalCuenta(c), n=piezas(c), T=TIPOS[c.tipo], imp=importeCuenta(c);
+    var c=r.c, t=totalCuenta(c), n=piezas(c), T=TIPOS[c.tipo], imp=totalACobrar(c), D=descuentoDe(c);
+    var marca=(D&&Math.abs(D.monto)>0.005)
+      ? '<span class="acc-desc">'+(D.monto<0?"+":"−")+pctTxt(Math.abs(D.pct))+'</span>' : "";
     var izq = T.madera ? (c.maderaNombre||(madera(c.maderaId)||{}).nombre||"sin madera")
                        : fmt((c.lineas||[]).reduce(function(s,l){return s+l.m2;},0),0)+" m²";
     return '<div class="acc'+(c.id===activeId&&!selMode?" on":"")+'" data-id="'+c.id+'">'
@@ -983,7 +1044,7 @@ function renderLista(){
       +'<div class="acc-m">'+esc(izq)+' · '+fecha(c.fecha)+' · '+miles(n)+' '+T.pieza+(n===1?"":"s")+'</div>'
       +(r.hit?'<span class="acc-hit">'+esc(r.hit)+'</span>':"")+'</div>'
       +'<div class="acc-v"><div class="acc-vol">'+fmt(t,T.dec)+' <span>'+T.u+'</span></div>'
-      +'<div class="acc-imp'+(imp>0?"":" cero")+'">'+(imp>0?money(imp):"sin precio")+'</div></div></div>';
+      +'<div class="acc-imp'+(imp>0?"":" cero")+'">'+marca+(imp>0?money(imp):"sin precio")+'</div></div></div>';
   }).join("");
 }
 document.getElementById("inBuscar").oninput=function(){ filtro=this.value; renderLista(); };
@@ -1215,6 +1276,80 @@ function renderCfg(){
   });
 }
 /* ============================================================
+   DESCUENTO — se abre tocando el importe de la cuenta
+   ============================================================ */
+var dcModo="pct", dcC=null;
+function abrirDescuento(c){
+  dcC=c;
+  var b=importeCuenta(c), D=descuentoDe(c);
+  dcModo=(D&&D.modo)||"pct";
+  document.getElementById("dcSub").textContent="Importe de la cuenta: "+money(b);
+  var inp=document.getElementById("dcIn");
+  inp.value = D ? (D.modo==="pct" ? fmt(D.valor,D.valor%1===0?0:2) : miles(D.valor)) : "";
+  document.getElementById("dcQuitar").hidden=!D;
+  pintarModos(); previewDesc();
+  document.getElementById("hojaDesc").hidden=false;
+  setTimeout(function(){ inp.focus(); },60);
+}
+function pintarModos(){
+  document.querySelectorAll("#hojaDesc .dm").forEach(function(b){
+    b.classList.toggle("on",b.dataset.modo===dcModo);
+  });
+  var inp=document.getElementById("dcIn");
+  inp.placeholder = dcModo==="pct" ? "10" : dcModo==="monto" ? "50.000" : "400.000";
+  inp.dataset.money = dcModo==="pct" ? "" : "1";
+}
+function valorDC(){
+  var inp=document.getElementById("dcIn");
+  return dcModo==="pct" ? num(inp.value) : numAR(inp.value);
+}
+function previewDesc(){
+  if(!dcC) return;
+  var b=importeCuenta(dcC), v=valorDC(), monto;
+  if(dcModo==="pct")        monto=b*v/100;
+  else if(dcModo==="monto") monto=v;
+  else                      monto=b-v;
+  if(monto>b) monto=b;
+  var fin=b-monto, hay=Math.abs(monto)>0.005;
+  document.getElementById("dcPrev").innerHTML=
+     'Cuenta: <b>'+money(b)+'</b><br>'
+    +(hay ? (monto<0?'Recargo: <b class="rec">+ '+money(-monto)+'</b>'
+                    :'Descuento: <b>− '+money(monto)+'</b>')
+           +'  ('+pctTxt(Math.abs(b>0?monto/b*100:0))+')<br>'
+          : 'Sin descuento<br>')
+    +'Queda: <b class="fin">'+money(fin)+'</b>';
+}
+document.querySelectorAll("#hojaDesc .dm").forEach(function(b){
+  b.onclick=function(){ dcModo=b.dataset.modo; pintarModos(); previewDesc();
+    document.getElementById("dcIn").focus(); };
+});
+document.getElementById("dcIn").addEventListener("input",function(){
+  if(this.dataset.money) autoMiles(this);
+  previewDesc();
+});
+document.getElementById("dcIn").addEventListener("keydown",function(e){
+  if(e.key==="Enter") document.getElementById("dcOk").click();
+});
+document.getElementById("dcCancel").onclick=function(){ document.getElementById("hojaDesc").hidden=true; };
+document.getElementById("hojaDesc").onclick=function(ev){ if(ev.target===this) this.hidden=true; };
+document.getElementById("dcQuitar").onclick=function(){
+  if(!dcC) return;
+  delete dcC.desc; dcC.mod=ahora(); save();
+  document.getElementById("hojaDesc").hidden=true;
+  renderTot(); renderLista(); toast("Descuento quitado");
+};
+document.getElementById("dcOk").onclick=function(){
+  if(!dcC) return;
+  var v=valorDC();
+  if(!(v>0)&&dcModo!=="final"){ toast("Poné un número"); return; }
+  dcC.desc={modo:dcModo, valor:v}; dcC.mod=ahora(); save();
+  document.getElementById("hojaDesc").hidden=true;
+  renderTot(); renderLista();
+  var D=descuentoDe(dcC);
+  toast(D&&D.monto<0?"Recargo aplicado":"Descuento aplicado");
+};
+
+/* ============================================================
    COPIAR / ENVIAR EL PEDIDO
    ============================================================ */
 function unidadTxt(u){ return u==="pie²"?"pie2":u==="m³"?"m3":u; }
@@ -1228,7 +1363,14 @@ function cierre(c){
   L.push("Total: "+fmt(totalCuenta(c),T.dec)+" "+unidadTxt(T.u));
   var B=(c.tipo==="celulosa")?bolsasDe(c):null;
   if(B) L.push("Bolsas: "+miles(B.bolsas)+(B.precio>0&&DB.celulosa.mostrarCosto?"  ("+money(B.costo)+")":""));
-  if(imp>0) L.push("Importe: "+money(imp));
+  if(imp>0){
+    var D=descuentoDe(c);
+    if(D&&Math.abs(D.monto)>0.005){
+      L.push("Subtotal: "+money(imp));
+      L.push(etiquetaDesc(D)+": "+(D.monto<0?"+ ":"- ")+money(Math.abs(D.monto)));
+      L.push("TOTAL: "+money(D.final));
+    }else L.push("Importe: "+money(imp));
+  }
   return L;
 }
 
@@ -1413,6 +1555,13 @@ function renderLineas(){
   }).join("");
 }
 
+function filasDescuento(c){
+  var D=descuentoDe(c); if(!D||Math.abs(D.monto)<0.005) return "";
+  return '<div class="tot-r"><div class="tot-k">'+esc(etiquetaDesc(D))+'</div>'
+       + '<div class="tot-desc">'+(D.monto<0?"+ ":"− ")+money(Math.abs(D.monto))+'</div></div>'
+       + '<div class="tot-r"><div class="tot-k">TOTAL A COBRAR</div>'
+       + '<div class="tot-fin clic" data-desc="1">'+money(D.final)+'</div></div>';
+}
 function renderTot(){
   var c=cuenta(), T=TIPOS[c.tipo], t=totalCuenta(c), n=piezas(c), imp=importeCuenta(c);
   var h="", faltan=espesoresSinPrecio(c);
@@ -1444,7 +1593,8 @@ function renderTot(){
         return val(x.esp+'″ '+money0(num(s[x.esp])),okx);
       }).join(" · ");
       h+='<div class="tot-r" style="margin-top:6px"><div class="tot-k">Importe · '+det+tagd(okE)+'</div>'
-        +'<div class="tot-2">'+money(imp)+'</div></div>';
+        +'<div class="tot-2 clic" data-desc="1">'+money(imp)+'</div></div>';
+      h+=filasDescuento(c);
     }
     /* ---- bolsas: la cantidad se muestra siempre; el costo, si está tildado en Config ---- */
     if(B){
@@ -1475,19 +1625,23 @@ function renderTot(){
       +(B?'<br>bolsa '+val(money0(B.precio)+' rinde '+fmt(B.rinde,2)+' m³',okB)+' <em>('+fecha(c.bolsaFecha||c.precioFecha||c.fecha)+')</em>':'');
   }else{
     var nom=c.maderaNombre||(madera(c.maderaId)||{}).nombre||"", pr=precioDe(c), okM=!maderaDifiere(c);
-    if(imp>0) h+='<div class="tot-r"><div class="tot-k">'+esc(nom)+' · '+val(money0(pr)+' / '+T.u,okM)+tagd(okM)+'</div>'
-      +'<div class="tot-2">'+money(imp)+'</div></div>';
+    if(imp>0){
+      h+='<div class="tot-r"><div class="tot-k">'+esc(nom)+' · '+val(money0(pr)+' / '+T.u,okM)+tagd(okM)+'</div>'
+        +'<div class="tot-2 clic" data-desc="1">'+money(imp)+'</div></div>';
+      h+=filasDescuento(c);
+    }
     pie=esc(c.codigo||"")+' · '+esc(nom||"sin madera")+' · '
       +(pr>0?val(money0(pr)+" / "+T.u,okM):"precio no cargado")+' <em>('+fecha(c.precioFecha||c.fecha)+')</em>'
       +(c.tipo==="rollizo"?'<br>'+METODOS[c.metodo||"cono"].n:'');
   }
 
   /* importe en dólares: siempre dentro del desplegable */
-  var dl=num(c.dolarSnap);
+  var dl=num(c.dolarSnap), cobrar=totalACobrar(c);
   if(dl>0&&imp>0){
     var okD=!dolarDifiere(c);
-    extra+='<div class="tot-r"><div class="tot-k">Cotización '+val(money0(dl)+' / U$S',okD)+tagd(okD)+'</div>'
-      +'<div class="tot-2" style="color:#1f6b8f">'+usd(imp/dl)+'</div></div>';
+    extra+='<div class="tot-r"><div class="tot-k">Cotización '+val(money0(dl)+' / U$S',okD)+tagd(okD)
+      +(Math.abs(cobrar-imp)>0.005?' <em style="font-style:normal">(con descuento)</em>':'')+'</div>'
+      +'<div class="tot-2" style="color:#1f6b8f">'+usd(cobrar/dl)+'</div></div>';
     if(c.tipo==="celulosa"&&DB.celulosa.mostrarCosto){ var B2=bolsasDe(c);
       if(B2&&B2.costo>0) extra+='<div class="tot-r"><div class="tot-k">Bolsas en dólares</div>'
         +'<div class="tot-2" style="color:#1f6b8f">'+usd(B2.costo/dl)+'</div></div>'; }
@@ -1510,6 +1664,10 @@ function renderTot(){
     if(mi.open) setTimeout(function(){ tb.scrollTop=tb.scrollHeight; },30);
   };
   if(c.verInfo&&mi) setTimeout(function(){ tb.scrollTop=tb.scrollHeight; },30);
+  /* tocar el importe abre el cuadro de descuento */
+  document.querySelectorAll("#totBox [data-desc]").forEach(function(b){
+    b.onclick=function(){ abrirDescuento(c); };
+  });
   /* atajos para completar los datos de la bolsa que falten en esta cuenta */
   document.querySelectorAll("#totBox [data-bolsa]").forEach(function(b){
     b.onclick=function(){
