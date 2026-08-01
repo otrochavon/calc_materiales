@@ -90,6 +90,8 @@ button{font:inherit}
      justify-content:space-between;gap:9px;align-items:center}
 .acc.on{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
 .acc-t{font-weight:600;font-size:16.5px;word-break:break-word}
+.acc-cli{color:var(--accent);font-weight:800}
+.acc-cli::before{content:"· "}
 .acc-m{font-size:13.5px;color:var(--muted);margin-top:2px}
 .acc-v{white-space:nowrap;text-align:right;flex:none}
 .acc-vol{font-weight:800;font-size:20px;color:var(--accent);line-height:1.15;font-variant-numeric:tabular-nums}
@@ -110,12 +112,18 @@ button{font:inherit}
 .empty{padding:26px 16px;text-align:center;color:var(--muted);font-size:15.5px;line-height:1.6}
 
 /* ============ editor: renglón título + madera ============ */
-.madrow{flex:none;display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--accent-soft);
+.madrow{flex:none;display:flex;flex-direction:column;gap:5px;padding:6px 8px;background:var(--accent-soft);
         border-bottom:1px solid var(--line)}
-.madrow #inTitulo{flex:1 1 56%;min-width:0;border:1px solid #d8c6ae;border-radius:8px;padding:8px;
-      font:inherit;font-size:16px;font-weight:700;background:#fff;color:var(--ink)}
-.madrow #selMadera{flex:1 1 44%;min-width:0;border:1px solid #d8c6ae;border-radius:8px;padding:8px 4px;
-      font:inherit;font-size:15px;font-weight:700;background:#fff;color:var(--ink);text-align:right}
+.mrow{display:flex;align-items:center;gap:6px;width:100%}
+.madrow input,.madrow select{min-width:0;border:1px solid #d8c6ae;border-radius:8px;padding:8px;
+      font:inherit;background:#fff;color:var(--ink)}
+.madrow #inTitulo{flex:1 1 58%;font-size:16px;font-weight:700}
+.madrow #inCliente{flex:1 1 42%;font-size:15px;font-weight:600}
+/* segundo renglón: madera o sistema, más los dos botones */
+.madrow2{flex:none;display:flex;align-items:center;gap:6px;padding:0 8px 6px;
+         background:var(--accent-soft);border-bottom:1px solid var(--line)}
+.madrow2 select{flex:1 1 auto;min-width:0;border:1px solid #d8c6ae;border-radius:8px;padding:8px 6px;
+      font:inherit;font-size:15px;font-weight:700;background:#fff;color:var(--ink)}
 .gear{border:1px solid #d8c6ae;background:#fff;color:var(--accent);border-radius:8px;
       padding:6px 9px;font-size:16px;line-height:1.1;cursor:pointer;flex:none}
 .gear.on{background:var(--accent);color:#fff}
@@ -263,10 +271,17 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
 .esp input{flex:1;min-width:0;border:1px solid var(--line);border-radius:9px;padding:10px;
            font:inherit;font-size:16px;font-weight:600;text-align:right;background:#fff;color:var(--ink);
            font-variant-numeric:tabular-nums}
+.esp .s-nom{flex:2;text-align:left;font-weight:700}
+.esp .s-rin{flex:1;max-width:88px}
+.esp-u{flex:none;font-size:12px;color:var(--muted);font-weight:600}
 .esp .btn{flex:none}
 .msg{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px;background:#fff;color:var(--ink);
      font:500 14.5px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;resize:vertical}
 .msg:focus{outline:2px solid var(--accent);outline-offset:-2px}
+.logo-fila{display:flex;align-items:center;gap:9px}
+.logo-mini{width:56px;height:56px;object-fit:contain;border:1px solid var(--line);border-radius:9px;
+           background:#fff;flex:none}
+.logo-mini.vacio{display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);text-align:center}
 .vars{display:flex;flex-wrap:wrap;gap:6px}
 .var{background:#fbf8f5;border:1px solid var(--line);border-radius:8px;padding:4px 8px;font-size:12.5px;color:var(--muted)}
 .var b{color:var(--accent);font-family:ui-monospace,Menlo,Consolas,monospace}
@@ -292,7 +307,23 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
 .modal-a .btn{flex:1}
 .modal-c.ancha{max-width:390px;max-height:88vh;overflow-y:auto}
 .modal-c.ancha .btn{margin-top:10px}
-/* ---- descuento ---- */
+/* ---- descuento y libro diario ---- */
+.blk-t{margin:18px 0 2px;font-size:12.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
+       color:var(--accent);border-top:2px solid var(--accent-soft);padding-top:12px}
+.lib-add{display:grid;grid-template-columns:1fr 1fr 96px 44px;gap:6px;margin:10px 0}
+.lib-add select,.lib-add input{min-width:0;border:1px solid var(--line);border-radius:9px;padding:9px 7px;
+      font:inherit;font-size:14.5px;background:#fff;color:var(--ink)}
+.lib-add #libMonto{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.lib-add .btn{padding:0;font-size:24px;font-weight:400}
+.lib-r{display:flex;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px solid var(--line);font-size:14px}
+.lib-f{flex:none;width:44px;color:var(--muted);font-size:12px}
+.lib-d{flex:1;min-width:0;word-break:break-word}
+.lib-d i{font-style:normal;font-weight:700}
+.lib-m{flex:none;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.lib-m.mas{color:var(--ok)} .lib-m.menos{color:var(--danger)}
+.lib-x{border:0;background:transparent;color:var(--danger);font-size:19px;line-height:1;padding:0 3px;cursor:pointer;flex:none}
+.lib-vacio{padding:14px 2px;color:var(--muted);font-size:13.5px;text-align:center}
+.dprev .fin.neg{color:var(--danger)}
 .dmodos{display:flex;gap:6px;margin:12px 0 10px}
 .dm{flex:1;min-width:0;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:9px;
     padding:10px 4px;font:inherit;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap}
@@ -303,10 +334,25 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
 .dprev .fin{color:var(--ok);font-size:18px;font-weight:800}
 .dprev .rec{color:var(--danger)}
 .tot-2.clic{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:4px}
+/* totalizador estilo recibo (celulosa) */
+.rec-r{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:2px 0;
+       font-size:15px;color:var(--muted)}
+.rec-r>b{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.rec-p{font-style:normal;font-size:13.5px;color:var(--accent);font-weight:600}
+.rec-r.tot{border-top:1px solid var(--line);margin-top:4px;padding-top:6px;font-weight:700;color:var(--ink)}
+.rec-r.tot>b{font-size:17px;font-weight:800;color:var(--accent)}
+.rec-sep{border-top:2px solid var(--accent);margin:9px 0 7px}
+.rec-r.desc>span,.rec-r.desc>b{color:var(--danger)}
+.rec-r.fin{font-weight:700;color:var(--ink)}
+.rec-r.fin>b{font-size:23px;font-weight:800;color:var(--ok)}
+.rec-r.usd>b{color:#1f6b8f;font-weight:800;font-size:16px}
 .tot-desc{color:var(--danger);font-weight:700;font-size:17px;font-variant-numeric:tabular-nums}
 .tot-fin{color:var(--ok);font-weight:800;font-size:21px;font-variant-numeric:tabular-nums}
 .acc-desc{display:inline-block;background:#eaf3ec;color:var(--ok);border-radius:6px;padding:0 5px;
           font-size:11.5px;font-weight:800;margin-right:4px;vertical-align:1px}
+.hoja-sep{margin:14px 0 2px;font-size:12.5px;font-weight:700;color:var(--muted);text-transform:uppercase;
+          letter-spacing:.5px;border-top:1px dashed var(--line);padding-top:12px}
+#hoja[data-detalle="0"] .ej,#hoja[data-detalle="0"] [data-fmt="grupo"]{display:none}
 .ej{background:#fbf8f5;border:1px dashed var(--line);border-radius:9px;padding:8px 10px;margin-top:6px;
     font:600 12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--muted);
     white-space:pre;overflow-x:auto}
@@ -344,9 +390,13 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
 
   <section class="pane" id="editor">
     <div class="madrow" id="madRow">
-      <input id="inTitulo" placeholder="Título del pedido" autocomplete="off">
+      <input id="inTitulo" placeholder="Presupuesto" autocomplete="off">
+      <input id="inCliente" placeholder="Cliente" autocomplete="off">
+    </div>
+    <div class="madrow2" id="madRow2">
       <select id="selMadera"></select>
-      <button class="gear" id="btnCopy" title="Copiar / enviar el pedido">↗</button>
+      <select id="selSis"></select>
+      <button class="gear" id="btnCopy" title="Enviar el pedido al cliente">↗</button>
       <button class="gear" id="btnCfg" title="Ajustes de la cuenta">⚙</button>
     </div>
     <div class="cfgpanel" id="cfgPanel" hidden>
@@ -365,6 +415,7 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
     <div class="subtabs">
       <button class="sub on" data-sub="madera">Madera</button>
       <button class="sub" data-sub="celulosa">Celulosa</button>
+      <button class="sub" data-sub="empresa">Empresa</button>
       <button class="sub" data-sub="mensajes">Mensajes</button>
       <button class="sub" data-sub="rotulos">Rótulos</button>
       <button class="sub" data-sub="dolar">Dólar</button>
@@ -381,6 +432,12 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
         <div class="padbox"><button class="btn wide ghost" id="btnNuevoEsp">+ Agregar otro espesor</button></div>
         <div class="sec">Bolsa de celulosa</div>
         <div id="bolsaBd"></div>
+        <div class="sec">Sistemas constructivos</div>
+        <div id="sistemasBd"></div>
+      </div>
+      <div id="cfgEmpresa" hidden>
+        <div id="empresaBd"></div>
+        <input type="file" id="fileLogo" accept="image/*" hidden>
       </div>
       <div id="cfgMensajes" hidden>
         <div id="mensajesBd"></div>
@@ -402,31 +459,51 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
 
 <div class="modal" id="hojaDesc" hidden>
   <div class="modal-c ancha">
-    <div class="modal-t">Descuento sobre la cuenta</div>
+    <div class="modal-t" id="dcTit">Importe de la cuenta</div>
     <div class="modal-s" id="dcSub"></div>
+
+    <div class="blk-t">Descuento</div>
     <div class="dmodos">
       <button class="dm" data-modo="pct">% Porcentaje</button>
-      <button class="dm" data-modo="monto">$ Descontar</button>
       <button class="dm" data-modo="final">= Dejar en</button>
     </div>
     <input id="dcIn" inputmode="decimal" autocomplete="off">
     <div class="dprev" id="dcPrev"></div>
     <div class="modal-a">
       <button class="btn danger" id="dcQuitar">Quitar</button>
-      <button class="btn ghost" id="dcCancel">Cancelar</button>
-      <button class="btn" id="dcOk">Aplicar</button>
+      <button class="btn" id="dcOk">Aplicar descuento</button>
+    </div>
+
+    <div class="blk-t">Libro diario</div>
+    <div class="lib-add">
+      <select id="libTipo">
+        <option value="adelanto">Adelanto (cobro)</option>
+        <option value="pago">Pago de material</option>
+        <option value="gasto">Otro gasto</option>
+      </select>
+      <input id="libDet" placeholder="detalle" autocomplete="off">
+      <input id="libMonto" inputmode="decimal" placeholder="0">
+      <button class="btn" id="libAdd">+</button>
+    </div>
+    <div id="libBd"></div>
+    <div class="dprev" id="libTot"></div>
+
+    <div class="modal-a" style="margin-top:14px">
+      <button class="btn ghost" id="dcCancel">Cerrar</button>
     </div>
   </div>
 </div>
 
 <div class="modal" id="hoja" hidden>
   <div class="modal-c ancha">
-    <div class="modal-t">Copiar pedido</div>
-    <div class="modal-s">Elegí cómo se arma el texto</div>
-    <button class="btn wide" data-fmt="simple">Lista simple</button>
+    <div class="modal-t">Enviar el pedido al cliente</div>
+    <div class="modal-s">El texto sale de <b>Config → Mensajes</b>. Elegí cómo se listan los renglones:</div>
+    <button class="btn wide" data-fmt="simple">Detalle renglón por renglón</button>
     <pre class="ej" id="ejSimple"></pre>
-    <button class="btn wide" data-fmt="grupo">Agrupado por medida</button>
+    <button class="btn wide" data-fmt="grupo">Detalle agrupado por medida</button>
     <pre class="ej" id="ejGrupo"></pre>
+    <div class="hoja-sep">o mandale un presupuesto armado</div>
+    <button class="btn wide" data-fmt="imagen">🖼  Presupuesto como imagen</button>
     <button class="btn ghost wide" id="hojaCancel">Cancelar</button>
   </div>
 </div>
@@ -451,7 +528,7 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
    cambios grandes (4.0).
    ESTE MISMO NÚMERO va en el VERSION de sw.js. Uno solo, dos archivos.
    ============================================================ */
-var APP_VER="3.7";
+var APP_VER="4.4";
 
 /* ============================================================
    FÓRMULAS
@@ -531,11 +608,40 @@ if(DB.celulosa.mostrarCosto==null) DB.celulosa.mostrarCosto=true;   // el costo 
 var MSG_DEF={
   rollizo:  "Hola {cliente}, te paso el detalle de {codigo}:\n\n{detalle}\n\nTotal: {total} {unidad}\n{importe}",
   escuadria:"Hola {cliente}, te paso el detalle de {codigo}:\n\n{detalle}\n\nTotal: {total} {unidad}\n{importe}",
-  celulosa: "Hola {cliente}, te paso el detalle de {codigo}:\n\n{detalle}\n\nTotal: {total} {unidad}\n{bolsas}\n{importe}"
+  celulosa: "Celulosa proyectada en {espesores} de espesor sobre {sistema}.\n"
+           +"Presupuesto: {titulo}\n"
+           +"Cliente: {cliente}\n\n"
+           +"{detallem2}\n\n"
+           +"total m2 a cubrir: {m2total} m2\n"
+           +"{descuento}"
+           +"Importe Total: {totalpesos}\n"
+           +"Dolares: {dolares}"
 };
+/* plantillas viejas que reemplazo por la nueva si el usuario no las tocó */
+var MSG_VIEJOS=["Hola {cliente}, te paso el detalle de {codigo}:\n\n{detalle}\n\nTotal: {total} {unidad}\n{bolsas}\n{importe}"];
 DB.mensajes=DB.mensajes||{};
 ["rollizo","escuadria","celulosa"].forEach(function(t){ if(DB.mensajes[t]==null) DB.mensajes[t]=MSG_DEF[t]; });
+if(MSG_VIEJOS.indexOf(DB.mensajes.celulosa)>=0) DB.mensajes.celulosa=MSG_DEF.celulosa;
+
+/* sistemas constructivos: cada uno con su rinde de bolsa (m³ por bolsa) */
+(function(){
+  var rDef=num((DB.celulosa.bolsa||{}).rinde)||0.5;
+  var s=DB.celulosa.sistemas;
+  if(!Array.isArray(s)||!s.length){
+    DB.celulosa.sistemas=[{n:"steel frame",rinde:rDef},{n:"balloon frame",rinde:rDef}];
+  }else if(typeof s[0]==="string"){                        // versión vieja: eran textos sueltos
+    DB.celulosa.sistemas=s.map(function(x){ return {n:x, rinde:rDef}; });
+  }
+})();
+function sistemasCelu(){ return DB.celulosa.sistemas; }
+function rindeDeSistema(n){
+  var s=sistemasCelu();
+  for(var i=0;i<s.length;i++) if(s[i].n===n) return num(s[i].rinde);
+  return num((s[0]||{}).rinde);
+}
 DB.dolar=parseFloat(DB.dolar)||0;
+/* datos de la empresa para el presupuesto en imagen */
+DB.empresa=DB.empresa||{nombre:"",datos:"",logo:""};
 [2,4,6].forEach(function(e){ if(DB.celulosa.precios[e]==null) DB.celulosa.precios[e]=0; });
 
 if(!DB.maderas.length){
@@ -553,8 +659,11 @@ DB.cuentas.forEach(function(c){
       c.maderaNombre=m?m.nombre:""; c.precioFecha=c.fecha;
     }
   }
-  if(c.tipo==="celulosa"&&!c.bolsaSnap){
-    c.bolsaSnap={precio:parseFloat(DB.celulosa.bolsa.precio)||0, rinde:parseFloat(DB.celulosa.bolsa.rinde)||0};
+  if(c.tipo==="celulosa"){
+    if(!c.bolsaSnap) c.bolsaSnap={precio:parseFloat(DB.celulosa.bolsa.precio)||0, rinde:0};
+    delete c.bolsaSnap.rindes;                                   // idea vieja, ya no hace falta
+    if(typeof c.sistema!=="string") c.sistema=(DB.celulosa.sistemas[0]||{}).n||"";
+    if(!(parseFloat(c.bolsaSnap.rinde)>0)) c.bolsaSnap.rinde=rindeDeSistema(c.sistema);
   }
   if(c.dolarSnap==null) c.dolarSnap=DB.dolar;
 });
@@ -623,7 +732,7 @@ function congelarCelu(c){
   c.precioFecha=ahora();
 }
 function congelarBolsa(c){
-  c.bolsaSnap={precio:num(DB.celulosa.bolsa.precio), rinde:num(DB.celulosa.bolsa.rinde)};
+  c.bolsaSnap={precio:num(DB.celulosa.bolsa.precio), rinde:rindeDeSistema(c.sistema)};
   c.bolsaFecha=ahora();
 }
 function congelarDolar(c){ c.dolarSnap=num(DB.dolar); c.dolarFecha=ahora(); }
@@ -635,7 +744,7 @@ function dolarDifiere(c){ return Math.abs(num(c.dolarSnap)-num(DB.dolar))>0.005;
 function bolsaDifiere(c){
   var b=c.bolsaSnap||{};
   return Math.abs(num(b.precio)-num(DB.celulosa.bolsa.precio))>0.005
-      || Math.abs(num(b.rinde)-num(DB.celulosa.bolsa.rinde))>0.0005;
+      || Math.abs(num(b.rinde)-rindeDeSistema(c.sistema))>0.0005;
 }
 function maderaDifiere(c){ return Math.abs(precioDe(c)-precioHoy(c))>0.005; }
 /* espesores del snapshot y de Config, unidos y ordenados */
@@ -717,6 +826,14 @@ function desgloseCelulosa(c){
   (c.lineas||[]).forEach(function(l){ m[l.esp]=(m[l.esp]||0)+l.m2; });
   return Object.keys(m).map(Number).sort(function(a,b){return a-b;}).map(function(e){return {esp:e,m2:m[e]};});
 }
+/* desglose para el mensaje: espesores de mayor a menor, con sus m² y su precio */
+function bloquesCelulosa(c){
+  var s=c.preciosSnap||{};
+  return desgloseCelulosa(c).slice().sort(function(a,b){return b.esp-a.esp;})
+    .map(function(x){ return {esp:x.esp, m2:x.m2, precio:num(s[x.esp])}; });
+}
+function m2Totales(c){ return (c.lineas||[]).reduce(function(a,l){return a+l.m2;},0); }
+
 /* espesores usados en la cuenta que no tienen precio congelado */
 function espesoresSinPrecio(c){
   if(c.tipo!=="celulosa") return [];
@@ -800,23 +917,22 @@ document.getElementById("celuBd").addEventListener("click",function(ev){
 function renderBolsa(){
   var b=DB.celulosa.bolsa;
   document.getElementById("bolsaBd").innerHTML='<div class="mad"><div class="mad-p">'
-    +'<div class="f"><label>Precio de la bolsa ($)</label><input id="bolPrecio" inputmode="decimal" value="'+(num(b.precio)?miles(num(b.precio)):"")+'" placeholder="0"></div>'
-    +'<div class="f"><label>Rinde por bolsa (m³)</label><input id="bolRinde" inputmode="decimal" value="'+(num(b.rinde)?(""+num(b.rinde)).replace(".",","):"")+'" placeholder="0,50"></div>'
+    +'<div class="f" style="grid-column:1/-1"><label>Precio de la bolsa ($)</label><input id="bolPrecio" inputmode="decimal" value="'+(num(b.precio)?miles(num(b.precio)):"")+'" placeholder="0"></div>'
     +'</div>'
     +'<label class="chk"><input type="checkbox" id="chkCosto"'+(DB.celulosa.mostrarCosto?" checked":"")+'>'
     +' Mostrar el costo de las bolsas en la cuenta</label>'
     +'<div class="mad-u" id="bolEj"></div></div>';
   function ejemplo(){
-    var r=num(b.rinde), p=num(b.precio), e=document.getElementById("bolEj");
-    if(!(r>0)){ e.innerHTML="Cargá el <b>rinde</b> para que cada cuenta estime las bolsas. Se acepta coma o punto: <b>0,5</b> = medio m³ por bolsa."; return; }
-    var n=Math.ceil(10/r), mc=DB.celulosa.mostrarCosto;
-    e.innerHTML='Control: si una bolsa rinde <b>'+fmt(r,2)+' m³</b>, para <b>10 m³</b> hacen falta <b>'+miles(n)+'</b> bolsa'+(n===1?"":"s")
-      +(p>0&&mc?' = '+money0(n*p):'')+'. Se congelan al crear la cuenta.'
+    var p=num(b.precio), e=document.getElementById("bolEj"), mc=DB.celulosa.mostrarCosto;
+    e.innerHTML='El <b>rinde</b> ya no vive acá: lo define cada sistema constructivo, más abajo.'
+      +'<br>Control para <b>10 m³</b>: '
+      +DB.celulosa.sistemas.map(function(s){
+          var r=num(s.rinde);
+          return esc(s.n||"(sin nombre)")+' → '+(r>0?miles(Math.ceil(10/r))+' bolsas'+(p>0&&mc?' = '+money0(Math.ceil(10/r)*p):''):'sin rinde');
+        }).join(' · ')
       +'<br>La <b>cantidad de bolsas</b> se muestra siempre; el <b>costo</b> solo si tildás la casilla.';
   }
   document.getElementById("bolPrecio").oninput=function(){ b.precio=autoMiles(this); save(); ejemplo(); };
-  /* el rinde es un decimal chico: no se le aplica separador de miles */
-  document.getElementById("bolRinde").oninput=function(){ b.rinde=num(this.value); save(); ejemplo(); };
   document.getElementById("chkCosto").onchange=function(){
     DB.celulosa.mostrarCosto=this.checked; save(); ejemplo();
   };
@@ -833,13 +949,66 @@ document.getElementById("btnNuevoEsp").onclick=function(){
 };
 
 /* ============================================================
+   CONFIG — empresa (encabezado del presupuesto en imagen)
+   ============================================================ */
+function renderEmpresa(){
+  var e=DB.empresa;
+  document.getElementById("empresaBd").innerHTML='<div class="mad">'
+    +'<div class="f"><label>Nombre de la empresa</label>'
+    +'<input id="emNom" class="txt" value="'+esc(e.nombre||"")+'" placeholder="Aserradero El Ombú"></div>'
+    +'<div class="f" style="margin-top:9px"><label>Datos de contacto (una o dos líneas)</label>'
+    +'<textarea id="emDat" class="msg" rows="2" placeholder="Tel 3757-123456\\nRuta 12 km 40, Eldorado">'+esc(e.datos||"")+'</textarea></div>'
+    +'<div class="f" style="margin-top:9px"><label>Logo</label>'
+    +'<div class="logo-fila">'
+    +(e.logo?'<img class="logo-mini" src="'+e.logo+'">':'<div class="logo-mini vacio">sin logo</div>')
+    +'<button class="btn ghost sm" id="btnLogo">'+(e.logo?"Cambiar":"Elegir imagen")+'</button>'
+    +(e.logo?'<button class="btn danger sm" id="btnLogoDel">Quitar</button>':'')
+    +'</div></div>'
+    +'<div class="mad-u">Aparecen arriba del presupuesto que se manda como <b>imagen</b>. '
+    +'El logo se achica solo y queda guardado en el teléfono, así que anda sin internet.</div></div>';
+  document.getElementById("emNom").oninput=function(){ DB.empresa.nombre=this.value; save(); };
+  document.getElementById("emDat").oninput=function(){ DB.empresa.datos=this.value; save(); };
+  document.getElementById("btnLogo").onclick=function(){ document.getElementById("fileLogo").click(); };
+  var bd=document.getElementById("btnLogoDel");
+  if(bd) bd.onclick=function(){ DB.empresa.logo=""; save(); renderEmpresa(); toast("Logo quitado"); };
+}
+/* achica el logo antes de guardarlo, para no llenar el almacenamiento */
+document.getElementById("fileLogo").onchange=function(){
+  var f=this.files&&this.files[0]; this.value="";
+  if(!f) return;
+  var fr=new FileReader();
+  fr.onload=function(){
+    var img=new Image();
+    img.onload=function(){
+      var max=360, k=Math.min(1,max/Math.max(img.width,img.height));
+      var cv=document.createElement("canvas");
+      cv.width=Math.round(img.width*k); cv.height=Math.round(img.height*k);
+      cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);
+      try{
+        DB.empresa.logo=cv.toDataURL("image/png");
+        save(); renderEmpresa(); toast("Logo cargado");
+      }catch(err){ alert("No se pudo guardar el logo."); }
+    };
+    img.onerror=function(){ alert("Ese archivo no es una imagen."); };
+    img.src=fr.result;
+  };
+  fr.readAsDataURL(f);
+};
+
+/* ============================================================
    CONFIG — textos para el cliente, uno por calculadora
    ============================================================ */
 var VARS=[
-  ["{cliente}","nombre del cliente"],["{codigo}","R1, T3, C2…"],["{titulo}","título completo"],
-  ["{fecha}","fecha de la cuenta"],["{madera}","tipo de madera"],["{detalle}","los renglones cargados"],
+  ["{nombre_empresa}","tu empresa"],["{nro_contacto}","tu 1ª línea de contacto"],
+  ["{cliente}","nombre del cliente"],["{codigo}","R1, T3, C2…"],["{titulo}","título de la cuenta"],
+  ["{fecha}","fecha de la cuenta"],["{madera}","tipo de madera"],
+  ["{detalle}","los renglones, simple o agrupado"],
   ["{total}","volumen total"],["{unidad}","m³ o pie²"],["{piezas}","cantidad de piezas"],
-  ["{importe}","subtotal, descuento y total"],["{bolsas}","bolsas de celulosa"]
+  ["{descuento}","subtotal + descuento, si lo hay"],
+  ["{totalpesos}","importe final en pesos"],["{dolares}","importe final en dólares"],
+  ["{importe}","subtotal, descuento y total"],["{bolsas}","bolsas de celulosa"],
+  ["{espesores}","celulosa: 4\" y 3\""],["{sistema}","celulosa: steel frame…"],
+  ["{detallem2}","celulosa: m² y precio por espesor"],["{m2total}","celulosa: m² totales"]
 ];
 function renderMensajes(){
   document.getElementById("mensajesBd").innerHTML=
@@ -848,7 +1017,8 @@ function renderMensajes(){
         +'<div class="mad"><textarea class="msg" data-tp="'+tp+'" rows="8" spellcheck="false">'
         +esc(DB.mensajes[tp])+'</textarea>'
         +'<div style="margin-top:8px"><button class="btn ghost sm" data-def="'+tp+'">Restaurar el texto por defecto</button></div>'
-        +'<div class="mad-u">Vista previa con tu última cuenta:</div>'
+        +'<div class="mad-u">Este texto sale al tocar <b>↗</b> en una cuenta de '+TIPOS[tp].n.toLowerCase()+'.'
+        +' Vista previa con tu última cuenta:</div>'
         +'<pre class="ej" id="mprev_'+tp+'"></pre></div>';
     }).join("")
     +'<div class="sec">Etiquetas que podés usar</div><div class="mad"><div class="vars">'
@@ -1040,13 +1210,42 @@ function renderDatos(){
   document.getElementById("btnMerge").onclick=function(){ pedirArchivo("fusionar"); };
   document.getElementById("btnReplace").onclick=function(){ pedirArchivo("reemplazar"); };
 }
-function renderConfig(){ renderMaderas(); renderCelulosa(); renderBolsa(); renderMensajes(); renderRotulo(); renderDolar(); renderDatos(); }
+function renderSistemas(){
+  document.getElementById("sistemasBd").innerHTML=
+    DB.celulosa.sistemas.map(function(s,i){
+      return '<div class="esp" data-i="'+i+'">'
+        +'<input class="s-nom" value="'+esc(s.n)+'" placeholder="nombre del sistema">'
+        +'<input class="s-rin" inputmode="decimal" value="'+(num(s.rinde)?(""+num(s.rinde)).replace(".",","):"")+'" placeholder="0,50">'
+        +'<span class="esp-u">m³/bolsa</span>'
+        +'<button class="btn danger sm s-del">✕</button></div>';
+    }).join("")
+    +'<div class="padbox"><button class="btn wide ghost" id="btnNuevoSis">+ Agregar sistema</button></div>'
+    +'<div class="mad"><div class="mad-u">Cada sistema tiene su propio <b>rinde</b>: cuántos m³ de celulosa cubre una bolsa. '
+    +'El sistema se elige en el renglón del pedido, y de ahí sale la cantidad de bolsas. '
+    +'En el mensaje al cliente es la etiqueta <b>{sistema}</b>.</div></div>';
+  document.querySelectorAll("#sistemasBd .esp").forEach(function(row){
+    var i=+row.dataset.i;
+    row.querySelector(".s-nom").oninput=function(){ DB.celulosa.sistemas[i].n=this.value; save(); };
+    row.querySelector(".s-rin").oninput=function(){ DB.celulosa.sistemas[i].rinde=num(this.value); save(); };
+    row.querySelector(".s-del").onclick=function(){
+      if(DB.celulosa.sistemas.length===1){ alert("Tiene que quedar al menos un sistema."); return; }
+      if(!confirm('¿Borrar "'+DB.celulosa.sistemas[i].n+'"? Las cuentas ya creadas conservan su rinde congelado.')) return;
+      DB.celulosa.sistemas.splice(i,1); save(); renderSistemas();
+    };
+  });
+  document.getElementById("btnNuevoSis").onclick=function(){
+    DB.celulosa.sistemas.push({n:"",rinde:0}); save(); renderSistemas();
+    var ns=document.querySelectorAll("#sistemasBd .s-nom");
+    if(ns.length) ns[ns.length-1].focus();
+  };
+}
+function renderConfig(){ renderMaderas(); renderCelulosa(); renderBolsa(); renderSistemas(); renderEmpresa(); renderMensajes(); renderRotulo(); renderDolar(); renderDatos(); }
 /* sub-solapas de Config */
 document.querySelectorAll(".sub").forEach(function(b){
   b.onclick=function(){
     document.querySelectorAll(".sub").forEach(function(x){x.classList.remove("on");});
     b.classList.add("on");
-    var m={madera:"cfgMadera",celulosa:"cfgCelulosa",mensajes:"cfgMensajes",
+    var m={madera:"cfgMadera",celulosa:"cfgCelulosa",empresa:"cfgEmpresa",mensajes:"cfgMensajes",
            rotulos:"cfgRotulos",dolar:"cfgDolar",datos:"cfgDatos"};
     Object.keys(m).forEach(function(k){ document.getElementById(m[k]).hidden=(k!==b.dataset.sub); });
     document.querySelector("#config .pane-bd").scrollTop=0;
@@ -1105,9 +1304,9 @@ function renderLista(){
                        : fmt((c.lineas||[]).reduce(function(s,l){return s+l.m2;},0),0)+" m²";
     return '<div class="acc'+(c.id===activeId&&!selMode?" on":"")+'" data-id="'+c.id+'">'
       +(selMode?'<input type="checkbox" class="acc-chk"'+(selIds[c.id]?" checked":"")+'>':"")
-      +'<div style="flex:1;min-width:0"><div class="acc-t">'+esc(c.titulo||"Sin título")+'</div>'
-      +'<div class="acc-m">'+(c.cliente?'<b style="color:var(--accent)">'+esc(c.cliente)+'</b> · ':'')
-      +esc(izq)+' · '+fecha(c.fecha)+' · '+miles(n)+' '+T.pieza+(n===1?"":"s")+'</div>'
+      +'<div style="flex:1;min-width:0"><div class="acc-t">'+esc((c.titulo||"Sin título").trim())
+      +(c.cliente?' <span class="acc-cli">'+esc(c.cliente)+'</span>':'')+'</div>'
+      +'<div class="acc-m">'+esc(izq)+' · '+fecha(c.fecha)+' · '+miles(n)+' '+T.pieza+(n===1?"":"s")+'</div>'
       +(r.hit?'<span class="acc-hit">'+esc(r.hit)+'</span>':"")+'</div>'
       +'<div class="acc-v"><div class="acc-vol">'+fmt(t,T.dec)+' <span>'+T.u+'</span></div>'
       +'<div class="acc-imp'+(imp>0?"":" cero")+'">'+marca+(imp>0?money(imp):"sin precio")+'</div></div></div>';
@@ -1249,22 +1448,44 @@ function renderEditor(){
   document.body.dataset.editing=c?"1":"0";
   if(!c){
     document.getElementById("madRow").style.display="none";
+    document.getElementById("madRow2").style.display="none";
     document.getElementById("cfgPanel").hidden=true;
     document.getElementById("formBox").innerHTML="";
     document.getElementById("lineasBd").innerHTML='<div class="empty">Elegí una cuenta de la lista<br>o creá una nueva.</div>';
     document.getElementById("totBox").innerHTML=""; return;
   }
   document.getElementById("madRow").style.display="";
+  document.getElementById("madRow2").style.display="";
   document.body.dataset.form="on"; formPin=false;
   document.getElementById("lineasBd").scrollTop=0;
   var ti=document.getElementById("inTitulo"); if(ti.value!==(c.titulo||"")) ti.value=c.titulo||"";
+  var ci=document.getElementById("inCliente"); if(ci.value!==(c.cliente||"")) ci.value=c.cliente||"";
   renderMaderaRow(); renderCfg(); renderForm(); renderLineas(); renderTot();
 }
 
 function renderMaderaRow(){
-  var c=cuenta(), sel=document.getElementById("selMadera");
-  if(!TIPOS[c.tipo].madera){ sel.style.display="none"; return; }   // celulosa no tiene tipo de madera
-  sel.style.display="";
+  var c=cuenta(), sel=document.getElementById("selMadera"), ss=document.getElementById("selSis");
+
+  /* celulosa: en vez de madera va el sistema constructivo, que define el rinde de la bolsa */
+  ss.hidden=(c.tipo!=="celulosa");
+  if(c.tipo==="celulosa"){
+    var L=DB.celulosa.sistemas;
+    if(L.indexOf&&typeof c.sistema!=="string") c.sistema=(L[0]||{}).n||"";
+    ss.innerHTML=L.map(function(s){
+      return '<option'+(s.n===c.sistema?" selected":"")+'>'+esc(s.n||"(sin nombre)")+'</option>';
+    }).join("")
+    +(L.some(function(s){return s.n===c.sistema;})?"":'<option selected>'+esc(c.sistema||"(sin sistema)")+'</option>');
+    ss.onchange=function(){
+      c.sistema=this.value;
+      c.bolsaSnap=c.bolsaSnap||{precio:0,rinde:0};
+      c.bolsaSnap.rinde=rindeDeSistema(c.sistema);    // cada sistema rinde distinto
+      c.bolsaFecha=ahora(); c.mod=ahora(); save();
+      renderCfg(); renderTot(); renderLista();
+    };
+  }
+
+  sel.hidden=!TIPOS[c.tipo].madera;
+  if(!TIPOS[c.tipo].madera) return;
   sel.innerHTML=DB.maderas.map(function(m){
     return '<option value="'+m.id+'"'+(m.id===c.maderaId?" selected":"")+'>'+esc(m.nombre||"(sin nombre)")+'</option>';
   }).join("")+(madera(c.maderaId)?"":'<option value="" selected>'+esc(c.maderaNombre||"(sin madera)")+'</option>');
@@ -1289,9 +1510,7 @@ function renderCfg(){
   var c=cuenta(), cfg=document.getElementById("cfgGrid"), hint=document.getElementById("cfgHint");
   var h="", ayuda="";
 
-  h+='<div class="f" style="margin-bottom:9px"><label>Cliente</label>'
-    +'<input id="inCliente" placeholder="nombre del cliente" value="'+esc(c.cliente||"")+'"></div>';
-
+  /* cliente y sistema ahora están en el renglón del pedido, no acá */
   if(c.tipo==="rollizo"){
     h+='<div class="f" style="margin-bottom:9px"><label>Método de cálculo</label><select id="selMet">'
       +Object.keys(METODOS).map(function(k){return '<option value="'+k+'"'+((c.metodo||"cono")===k?" selected":"")+'>'+METODOS[k].n+'</option>';}).join("")
@@ -1342,9 +1561,6 @@ function renderCfg(){
        +"<br>Creada "+fechaH(c.fecha)+(c.mod&&c.mod!==c.fecha?" · editada "+fechaH(c.mod):"");
   cfg.innerHTML=h; hint.innerHTML=ayuda;
 
-  document.getElementById("inCliente").oninput=function(){
-    c.cliente=this.value; c.mod=ahora(); save(); renderLista();
-  };
   var sm=document.getElementById("selMet");
   if(sm) sm.onchange=function(){ c.metodo=this.value; c.mod=ahora(); save(); renderLineas(); renderTot(); renderLista(); };
 
@@ -1359,18 +1575,42 @@ function renderCfg(){
 /* ============================================================
    DESCUENTO — se abre tocando el importe de la cuenta
    ============================================================ */
+/* ---------- libro diario de la cuenta ---------- */
+var LIB={adelanto:{n:"Adelanto",signo:1},pago:{n:"Pago",signo:-1},gasto:{n:"Gasto",signo:-1}};
+function libroDe(c){ return c.libro||(c.libro=[]); }
+function resumenLibro(c){
+  var r={adelantos:0,pagos:0,gastos:0};
+  libroDe(c).forEach(function(x){
+    if(x.t==="adelanto") r.adelantos+=num(x.m);
+    else if(x.t==="pago") r.pagos+=num(x.m);
+    else r.gastos+=num(x.m);
+  });
+  r.cobrar=totalACobrar(c);
+  r.margen=r.cobrar-r.pagos-r.gastos;
+  r.pct=r.cobrar>0?r.margen/r.cobrar*100:0;
+  r.saldo=r.cobrar-r.adelantos;
+  return r;
+}
+/* costo que la app ya conoce, para sugerirlo al asentar un pago */
+function costoSugerido(c){
+  if(c.tipo==="celulosa"){ var B=bolsasDe(c); return B?B.costo:0; }
+  return 0;
+}
+
 var dcModo="pct", dcC=null;
 function abrirDescuento(c){
   dcC=c;
   var b=importeCuenta(c), D=descuentoDe(c);
-  dcModo=(D&&D.modo)||"pct";
-  document.getElementById("dcSub").textContent="Importe de la cuenta: "+money(b);
+  dcModo=(D&&D.modo==="final")?"final":"pct";        // solo dos modos
+  document.getElementById("dcTit").textContent="Importe · "+(c.codigo||"");
+  document.getElementById("dcSub").textContent="Cuenta sin descuento: "+money(b);
   var inp=document.getElementById("dcIn");
-  inp.value = D ? (D.modo==="pct" ? fmt(D.valor,D.valor%1===0?0:2) : miles(D.valor)) : "";
+  if(D&&D.modo==="pct")        inp.value=fmt(D.valor,D.valor%1===0?0:2);
+  else if(D&&D.modo==="final") inp.value=miles(D.valor);
+  else                         inp.value=(dcModo==="pct"?"0":miles(b));
   document.getElementById("dcQuitar").hidden=!D;
-  pintarModos(); previewDesc();
+  pintarModos(); previewDesc(); renderLibro();
   document.getElementById("hojaDesc").hidden=false;
-  setTimeout(function(){ inp.focus(); },60);
 }
 function pintarModos(){
   document.querySelectorAll("#hojaDesc .dm").forEach(function(b){
@@ -1401,9 +1641,64 @@ function previewDesc(){
     +'Queda: <b class="fin">'+money(fin)+'</b>';
 }
 document.querySelectorAll("#hojaDesc .dm").forEach(function(b){
-  b.onclick=function(){ dcModo=b.dataset.modo; pintarModos(); previewDesc();
-    document.getElementById("dcIn").focus(); };
+  b.onclick=function(){
+    dcModo=b.dataset.modo;
+    /* al cambiar de modo arranco con el valor neutro de cada uno */
+    var inp=document.getElementById("dcIn");
+    inp.value = dcModo==="pct" ? "0" : miles(importeCuenta(dcC));
+    pintarModos(); previewDesc(); inp.select();
+  };
 });
+
+/* ---------- libro diario: alta, baja y resumen ---------- */
+function renderLibro(){
+  var c=dcC; if(!c) return;
+  var L=libroDe(c), bd=document.getElementById("libBd");
+  bd.innerHTML = L.length ? L.map(function(x,i){
+      var s=LIB[x.t].signo;
+      return '<div class="lib-r"><span class="lib-f">'+fecha(x.f).slice(0,5)+'</span>'
+        +'<span class="lib-d"><i>'+LIB[x.t].n+'</i>'+(x.d?" · "+esc(x.d):"")+'</span>'
+        +'<span class="lib-m '+(s>0?"mas":"menos")+'">'+(s>0?"+ ":"− ")+money(num(x.m))+'</span>'
+        +'<button class="lib-x" data-lib="'+i+'">×</button></div>';
+    }).join("")
+    : '<div class="lib-vacio">Sin movimientos. Asentá adelantos, pagos de material y gastos.</div>';
+
+  var r=resumenLibro(c);
+  document.getElementById("libTot").innerHTML=
+     'Total a cobrar: <b>'+money(r.cobrar)+'</b><br>'
+    +'− Pagos de material: <b>'+money(r.pagos)+'</b><br>'
+    +'− Otros gastos: <b>'+money(r.gastos)+'</b><br>'
+    +'MARGEN NETO: <b class="fin'+(r.margen<0?" neg":"")+'">'+money(r.margen)+'</b>'
+    +(r.cobrar>0?'  ('+pctTxt(r.pct)+')':'')
+    +'<br><br>Cobrado: <b>'+money(r.adelantos)+'</b>'
+    +'<br>Saldo del cliente: <b'+(r.saldo>0?' style="color:var(--danger)"':'')+'>'+money(r.saldo)+'</b>';
+
+  document.querySelectorAll("#libBd [data-lib]").forEach(function(b){
+    b.onclick=function(){
+      L.splice(+b.dataset.lib,1); c.mod=ahora(); save(); renderLibro(); renderTot(); renderLista();
+    };
+  });
+}
+document.getElementById("libTipo").onchange=function(){
+  var m=document.getElementById("libMonto");
+  if(this.value==="pago"&&!numAR(m.value)){
+    var s=costoSugerido(dcC); if(s>0) m.value=miles(s);   // sugiere el costo que ya conoce
+  }
+};
+document.getElementById("libMonto").addEventListener("input",function(){ autoMiles(this); });
+document.getElementById("libMonto").addEventListener("keydown",function(e){
+  if(e.key==="Enter") document.getElementById("libAdd").click();
+});
+document.getElementById("libAdd").onclick=function(){
+  var c=dcC; if(!c) return;
+  var m=numAR(document.getElementById("libMonto").value);
+  if(!(m>0)){ toast("Poné el monto"); document.getElementById("libMonto").focus(); return; }
+  libroDe(c).push({f:ahora(), t:document.getElementById("libTipo").value,
+                   d:document.getElementById("libDet").value.trim(), m:m});
+  c.mod=ahora(); save();
+  document.getElementById("libDet").value=""; document.getElementById("libMonto").value="";
+  renderLibro(); renderTot(); renderLista();
+};
 document.getElementById("dcIn").addEventListener("input",function(){
   if(this.dataset.money) autoMiles(this);
   previewDesc();
@@ -1416,18 +1711,21 @@ document.getElementById("hojaDesc").onclick=function(ev){ if(ev.target===this) t
 document.getElementById("dcQuitar").onclick=function(){
   if(!dcC) return;
   delete dcC.desc; dcC.mod=ahora(); save();
-  document.getElementById("hojaDesc").hidden=true;
-  renderTot(); renderLista(); toast("Descuento quitado");
+  document.getElementById("dcQuitar").hidden=true;
+  document.getElementById("dcIn").value=(dcModo==="pct"?"0":miles(importeCuenta(dcC)));
+  previewDesc(); renderLibro(); renderTot(); renderLista(); toast("Descuento quitado");
 };
 document.getElementById("dcOk").onclick=function(){
   if(!dcC) return;
   var v=valorDC();
-  if(!(v>0)&&dcModo!=="final"){ toast("Poné un número"); return; }
-  dcC.desc={modo:dcModo, valor:v}; dcC.mod=ahora(); save();
-  document.getElementById("hojaDesc").hidden=true;
-  renderTot(); renderLista();
+  if(dcModo==="pct"&&!(v>0)){ delete dcC.desc; }        // 0% = sin descuento
+  else if(!(v>0)){ toast("Poné un número"); return; }
+  else dcC.desc={modo:dcModo, valor:v};
+  dcC.mod=ahora(); save();
+  document.getElementById("dcQuitar").hidden=!dcC.desc;
+  previewDesc(); renderLibro(); renderTot(); renderLista();
   var D=descuentoDe(dcC);
-  toast(D&&D.monto<0?"Recargo aplicado":"Descuento aplicado");
+  toast(!dcC.desc?"Sin descuento":(D&&D.monto<0?"Recargo aplicado":"Descuento aplicado"));
 };
 
 /* ============================================================
@@ -1523,15 +1821,40 @@ function armarMensaje(c,agrupado){
   var bolTxt = B ? "Bolsas: "+miles(B.bolsas)
         +(B.precio>0&&DB.celulosa.mostrarCosto?"  ("+money(B.costo)+")":"") : "";
 
+  /* propios de celulosa */
+  var esp="", detM2="", m2t="";
+  if(c.tipo==="celulosa"){
+    var bl=bloquesCelulosa(c);
+    esp=bl.map(function(x){return x.esp+'"';})
+          .reduce(function(a,v,i,ar){ return i===0?v:(i===ar.length-1?a+" y "+v:a+", "+v); },"");
+    detM2=bl.map(function(x){
+      return 'en '+x.esp+'" espesor:  sup. a cubrir '+fmt(x.m2,0)+' m2'
+        +(x.precio>0?',  precio '+money0(x.precio)+' x m2':'');
+    }).join("\n");
+    m2t=fmt(m2Totales(c),0);
+  }
+  var dl=num(c.dolarSnap), cobrar=totalACobrar(c);
+
   var vals={
+    "{nombre_empresa}": (DB.empresa||{}).nombre||"",
+    "{nro_contacto}":   ((DB.empresa||{}).datos||"").split("\n")[0]||"",
     "{cliente}": c.cliente||"",
     "{codigo}":  c.codigo||"",
     "{titulo}":  (c.titulo||"").trim(),
     "{fecha}":   fecha(c.fecha),
     "{madera}":  T.madera ? (c.maderaNombre||(madera(c.maderaId)||{}).nombre||"") : "",
+    "{sistema}": c.sistema||(DB.celulosa.sistemas[0]||""),
+    "{espesores}": esp,
+    "{detallem2}": detM2,
+    "{m2total}": m2t,
     "{total}":   fmt(totalCuenta(c),T.dec),
     "{unidad}":  unidadTxt(T.u),
     "{piezas}":  miles(piezas(c))+" "+T.pieza+(piezas(c)===1?"":"s"),
+    "{descuento}": (D&&Math.abs(D.monto)>0.005&&imp>0)
+        ? "Subtotal: "+money0(imp)+"\n"+etiquetaDesc(D)+": "+(D.monto<0?"+ ":"- ")+money0(Math.abs(D.monto))+"\n"
+        : "",
+    "{totalpesos}": cobrar>0?money0(cobrar):"",
+    "{dolares}": (dl>0&&cobrar>0)?("u$s "+(cobrar/dl).toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2})):"",
     "{importe}": impTxt,
     "{bolsas}":  bolTxt
   };
@@ -1551,6 +1874,185 @@ function armarMensaje(c,agrupado){
   return txt.split("{detalle}").join(det);
 }
 
+/* ============================================================
+   PRESUPUESTO EN IMAGEN
+   Arma los renglones y después los dibuja en un canvas.
+   ============================================================ */
+function datosPresupuesto(c){
+  var T=TIPOS[c.tipo], D=descuentoDe(c), imp=importeCuenta(c), filas=[];
+  if(c.tipo==="celulosa"){
+    var s=c.preciosSnap||{};
+    bloquesCelulosa(c).forEach(function(x){
+      filas.push({k:x.esp+'" espesor'+(x.precio>0?"  —  "+money0(x.precio)+" / m²":""),
+                  v:fmt(x.m2,0)+" m²"});
+    });
+    filas.push({k:"TOTAL a cubrir", v:fmt(m2Totales(c),0)+" m²", sub:true});
+  }else{
+    detalleAgrupado(c).forEach(function(l){
+      var ind=/^\s/.test(l);
+      filas.push({k:l.trim(), v:"", ind:ind, grupo:!ind});
+    });
+    filas.push({k:"Total del pedido", v:fmt(totalCuenta(c),T.dec)+" "+T.u, sub:true});
+  }
+  var tot=[];
+  if(imp>0){
+    if(D&&Math.abs(D.monto)>0.005){
+      tot.push({k:"Subtotal", v:money(imp)});
+      tot.push({k:etiquetaDesc(D), v:(D.monto<0?"+ ":"− ")+money(Math.abs(D.monto)), rojo:true});
+      tot.push({k:"TOTAL", v:money(D.final), fin:true});
+    }else tot.push({k:"TOTAL", v:money(imp), fin:true});
+    var dl=num(c.dolarSnap);
+    if(dl>0) tot.push({k:"en dólares", v:usd(totalACobrar(c)/dl), usd:true});
+  }
+  return {filas:filas, tot:tot};
+}
+
+function dibujarPresupuesto(c,cb){
+  var E=DB.empresa||{}, dp=datosPresupuesto(c), T=TIPOS[c.tipo];
+  var W=1080, P=64, S=2;                       // ancho fijo; S = escala de tipografías
+  var F='600 %spx -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif';
+  function f(px,peso){ return (peso||600)+" "+Math.round(px*S)+"px -apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif"; }
+
+  var logo=null;
+  function seguir(){
+    /* --- primero armo la lista de renglones con su alto, después dibujo --- */
+    var hEnc=logo?240:(E.nombre?190:150);
+    var reng=[];
+    /* L3: Presupuesto + calculadora · L4: código y cliente · L5: madera o sistema */
+    reng.push({tipo:"titulo", alto:60});
+    var l4=["Cod: "+(c.codigo||"")];
+    if((c.titulo||"").trim()) l4.push((c.titulo||"").trim());
+    if(c.cliente) l4.push(c.cliente);
+    reng.push({tipo:"sub", txt:l4.join("  ·  "), alto:48, color:"#7a4f24", f:[17,700]});
+
+    var l5=[];
+    if(c.tipo==="celulosa"){ if(c.sistema) l5.push(c.sistema); }
+    else{
+      var nomM=c.maderaNombre||(madera(c.maderaId)||{}).nombre||"";
+      if(nomM) l5.push(nomM);
+      if(c.tipo==="escuadria"){
+        var prT=precioDe(c);
+        if(prT>0) l5.push(money0(prT)+" / pie²");
+        l5.push(miles(piezas(c))+" unidades");
+      }
+    }
+    if(l5.length) reng.push({tipo:"sub", txt:l5.join("  ·  "), alto:44, color:"#8a7a6e", f:[15,500]});
+    reng.push({tipo:"raya", alto:56});
+    dp.filas.forEach(function(r){
+      reng.push({tipo:r.sub?"subtotal":"fila", r:r, alto:r.sub?76:(r.grupo?68:60)});
+    });
+    reng.push({tipo:"raya2", alto:60});
+    dp.tot.forEach(function(r){ reng.push({tipo:"total", r:r, alto:r.fin?76:60}); });
+
+    var H=hEnc+40;
+    reng.forEach(function(r){ H+=r.alto; });
+    H+=80;                                            // pie
+    H=Math.round(H);
+
+    var cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+    var x=cv.getContext("2d");
+    x.textBaseline="alphabetic";
+    x.fillStyle="#ffffff"; x.fillRect(0,0,W,H);
+
+    /* encabezado */
+    x.fillStyle="#7a4f24"; x.fillRect(0,0,W,hEnc);
+    var tx=P;
+    if(logo){
+      var lh=logo.height*(120/Math.max(logo.width,logo.height)), lw=logo.width*(120/Math.max(logo.width,logo.height));
+      x.fillStyle="#ffffff";
+      x.fillRect(P-8,(hEnc-lh)/2-8,lw+16,lh+16);
+      x.drawImage(logo,P,(hEnc-lh)/2,lw,lh);
+      tx=P+lw+34;
+    }
+    x.fillStyle="#ffffff"; x.font=f(27,800);
+    x.fillText((E.nombre||"Presupuesto").toUpperCase(), tx, logo?hEnc/2-4:74);
+    x.font=f(15,500); x.fillStyle="rgba(255,255,255,.85)";
+    (E.datos||"").split("\n").slice(0,2).forEach(function(l,i){
+      x.fillText(l, tx, (logo?hEnc/2+30:112)+i*26*S/2*1.4);
+    });
+
+    /* cuerpo */
+    var yy=hEnc+40;
+    reng.forEach(function(g){
+      var b=yy+g.alto*0.66;                       // línea de base del renglón
+      if(g.tipo==="titulo"){
+        x.fillStyle="#2a221d"; x.font=f(24,800);
+        x.fillText("Presupuesto "+T.n, P, b);
+        x.font=f(15,500); x.fillStyle="#8a7a6e";
+        x.textAlign="right"; x.fillText(fecha(c.fecha), W-P, b); x.textAlign="left";
+      }else if(g.tipo==="sub"){
+        x.fillStyle=g.color; x.font=f(g.f[0],g.f[1]);
+        x.fillText(g.txt, P, b);
+      }else if(g.tipo==="raya"){
+        x.strokeStyle="#e2d9cf"; x.lineWidth=2;
+        x.beginPath(); x.moveTo(P,yy+g.alto/2); x.lineTo(W-P,yy+g.alto/2); x.stroke();
+      }else if(g.tipo==="raya2"){
+        x.strokeStyle="#7a4f24"; x.lineWidth=4;
+        x.beginPath(); x.moveTo(P,yy+g.alto/2); x.lineTo(W-P,yy+g.alto/2); x.stroke();
+      }else if(g.tipo==="fila"){
+        var r=g.r;
+        x.fillStyle=r.grupo?"#2a221d":"#5c5049"; x.font=f(r.grupo?17:15,r.grupo?700:500);
+        x.fillText(r.k, P+(r.ind?26*S:0), b);
+        if(r.v){ x.textAlign="right"; x.fillStyle="#2a221d"; x.font=f(17,700);
+                 x.fillText(r.v,W-P,b); x.textAlign="left"; }
+      }else if(g.tipo==="subtotal"){
+        /* el subtotal de volumen va chico y pegado a la etiqueta:
+           el protagonista de la imagen es siempre el precio final */
+        x.strokeStyle="#e2d9cf"; x.lineWidth=2;
+        x.beginPath(); x.moveTo(P,yy+8); x.lineTo(W-P,yy+8); x.stroke();
+        x.fillStyle="#5c5049"; x.font=f(16,700);
+        x.fillText(g.r.k,P,b+8);
+        var anchoEt=x.measureText(g.r.k).width;
+        x.fillStyle="#7a4f24"; x.font=f(17,800);
+        x.fillText(g.r.v, P+anchoEt+28, b+8);
+      }else if(g.tipo==="total"){
+        var t2=g.r;
+        x.fillStyle=t2.rojo?"#b5423a":(t2.usd?"#1f6b8f":"#5c5049");
+        x.font=f(t2.fin?19:16,t2.fin?800:600);
+        x.fillText(t2.k,P,b);
+        x.textAlign="right";
+        x.fillStyle=t2.fin?"#2f7a4f":(t2.rojo?"#b5423a":(t2.usd?"#1f6b8f":"#2a221d"));
+        x.font=f(t2.fin?26:17,t2.fin?800:700);
+        x.fillText(t2.v,W-P,b); x.textAlign="left";
+      }
+      yy+=g.alto;
+    });
+
+    /* pie */
+    x.fillStyle="#a8998e"; x.font=f(13,500); x.textAlign="center";
+    x.fillText("Presupuesto emitido el "+fechaH(new Date().toISOString())+" · "+T.n, W/2, H-34);
+    x.textAlign="left";
+    cb(cv);
+  }
+
+  if(E.logo){
+    logo=new Image();
+    logo.onload=seguir;
+    logo.onerror=function(){ logo=null; seguir(); };
+    logo.src=E.logo;
+  }else seguir();
+}
+
+function enviarImagen(c){
+  dibujarPresupuesto(c,function(cv){
+    cv.toBlob(function(blob){
+      if(!blob){ toast("No se pudo generar la imagen"); return; }
+      var nom="presupuesto-"+(c.codigo||"")+".png";
+      try{
+        var file=new File([blob],nom,{type:"image/png"});
+        if(navigator.canShare&&navigator.canShare({files:[file]})){
+          navigator.share({files:[file]}).catch(function(){});
+          return;
+        }
+      }catch(e){}
+      var url=URL.createObjectURL(blob), a=document.createElement("a");
+      a.href=url; a.download=nom; document.body.appendChild(a); a.click();
+      setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); },3000);
+      toast("Imagen descargada");
+    },"image/png");
+  });
+}
+
 function enviarTexto(txt){
   if(navigator.share){
     navigator.share({text:txt}).catch(function(e){
@@ -1561,11 +2063,16 @@ function enviarTexto(txt){
 document.getElementById("btnCopy").onclick=function(){
   var c=cuenta(); if(!c) return;
   if(!(c.lineas||[]).length){ toast("La cuenta no tiene líneas"); return; }
+  /* si la plantilla no usa {detalle}, no hace falta preguntar el formato del texto */
+  var pl=DB.mensajes[c.tipo]||"", pide=pl.indexOf("{detalle}")>=0;
+  document.getElementById("hoja").dataset.detalle=pide?"1":"0";
+  document.querySelector('[data-fmt="simple"]').textContent=pide?"Detalle renglón por renglón":"Enviar el texto";
+  document.getElementById("hoja").hidden=false;
+  if(!pide){ return; }
   document.getElementById("ejSimple").textContent=detalleSimple(c).slice(0,3).join("\n")
     +(detalleSimple(c).length>3?"\n…":"");
   var g=detalleAgrupado(c);
   document.getElementById("ejGrupo").textContent=g.slice(0,5).join("\n")+(g.length>5?"\n…":"");
-  document.getElementById("hoja").hidden=false;
 };
 document.getElementById("hojaCancel").onclick=function(){ document.getElementById("hoja").hidden=true; };
 document.getElementById("hoja").onclick=function(ev){
@@ -1573,6 +2080,7 @@ document.getElementById("hoja").onclick=function(ev){
   var b=ev.target.closest("[data-fmt]"); if(!b) return;
   var c=cuenta(); if(!c) return;
   this.hidden=true;
+  if(b.dataset.fmt==="imagen"){ enviarImagen(c); return; }
   enviarTexto(b.dataset.fmt==="grupo"?textoPedidoAgrupado(c):textoPedido(c));
 };
 
@@ -1674,8 +2182,11 @@ function renderTot(){
       +'<div class="aviso-a">'+faltan.map(function(e){
           return '<button class="btn" data-esp="'+e+'">Cargar precio de '+e+'"</button>';}).join("")+'</div></div>';
   }
-  h+='<div class="tot-r"><div class="tot-k">TOTAL · '+miles(n)+' '+T.pieza+(n===1?"":"s")+'</div>'
+  /* en celulosa el número grande son los m² a cubrir; el m³ va en «+ info» */
+  if(c.tipo!=="celulosa"){
+    h+='<div class="tot-r"><div class="tot-k">TOTAL · '+miles(n)+' '+T.pieza+(n===1?"":"s")+'</div>'
        +'<div class="tot-v">'+fmt(t,T.dec)+' <small>'+T.u+'</small></div></div>';
+  }
 
   /* verde = coincide con Config · naranja = quedó viejo */
   function val(txt,ok){ return '<span class="'+(ok?"pok":"pdes")+'">'+txt+'</span>'; }
@@ -1684,23 +2195,46 @@ function renderTot(){
   var pie="", extra="";
   if(c.tipo==="celulosa"){
     var s=c.preciosSnap||{}, okE=!espDifiere(c), B=bolsasDe(c), okB=!bolsaDifiere(c);
-    var dg=desgloseCelulosa(c);
-    if(dg.length) h+='<div class="desglose">'+dg.map(function(x){
-      return '<span class="chip">'+x.esp+'" <small>·</small> '+fmt(x.m2,0)+' m²</span>';}).join("")+'</div>';
+    var dg=desgloseCelulosa(c).slice().sort(function(a,b){return b.esp-a.esp;});
+
+    /* ---------- recibo: m² por espesor, total m², importe ---------- */
+    dg.forEach(function(x){
+      var p=num(s[x.esp]);
+      h+='<div class="rec-r"><span>'+x.esp+'″ espesor'
+        +(p>0?' <em class="rec-p">— '+money0(p)+' / m²</em>':'')+'</span>'
+        +'<b>'+fmt(x.m2,0)+' m²</b></div>';
+    });
+    h+='<div class="rec-r tot"><span>TOTAL a cubrir</span><b>'+fmt(m2Totales(c),0)+' m²</b></div>';
+
     if(imp>0){
-      var det=dg.filter(function(x){return num(s[x.esp])>0;}).map(function(x){
-        var okx=Math.abs(num(s[x.esp])-num(DB.celulosa.precios[x.esp]))<=0.005;
-        return val(x.esp+'″ '+money0(num(s[x.esp])),okx);
-      }).join(" · ");
-      h+='<div class="tot-r" style="margin-top:6px"><div class="tot-k">Importe · '+det+tagd(okE)+'</div>'
-        +'<div class="tot-2 clic" data-desc="1">'+money(imp)+'</div></div>';
-      h+=filasDescuento(c);
+      var D2=descuentoDe(c), hayD=D2&&Math.abs(D2.monto)>0.005;
+      h+='<div class="rec-sep"></div>';
+      if(hayD){
+        h+='<div class="rec-r"><span>Subtotal'+tagd(okE)+'</span>'
+          +'<b class="clic" data-desc="1">'+money(imp)+'</b></div>'
+          +'<div class="rec-r desc"><span>'+esc(etiquetaDesc(D2))+'</span>'
+          +'<b>'+(D2.monto<0?"+ ":"− ")+money(Math.abs(D2.monto))+'</b></div>'
+          +'<div class="rec-r fin"><span>TOTAL</span><b class="clic" data-desc="1">'+money(D2.final)+'</b></div>';
+      }else{
+        h+='<div class="rec-r fin"><span>TOTAL'+tagd(okE)+'</span>'
+          +'<b class="clic" data-desc="1">'+money(imp)+'</b></div>';
+      }
+      var dl2=num(c.dolarSnap), fin2=totalACobrar(c);
+      if(dl2>0) h+='<div class="rec-r usd"><span>en dólares</span><b>'+usd(fin2/dl2)+'</b></div>';
     }
-    /* ---- bolsas: la cantidad se muestra siempre; el costo, si está tildado en Config ---- */
+
+    /* ---------- el resto, adentro de «+ info» ---------- */
+    extra+='<div class="tot-r"><div class="tot-k">Volumen · '+miles(n)+' '+T.pieza+(n===1?"":"s")+'</div>'
+      +'<div class="tot-2" style="color:var(--accent)">'+fmt(t,T.dec)+' m³</div></div>';
+    var precios=dg.filter(function(x){return num(s[x.esp])>0;}).map(function(x){
+      var okx=Math.abs(num(s[x.esp])-num(DB.celulosa.precios[x.esp]))<=0.005;
+      return val(x.esp+'″ '+money0(num(s[x.esp])),okx);
+    }).join(" · ");
+    if(precios) extra+='<div class="tot-r"><div class="tot-k">Precios por m²</div>'
+      +'<div class="tot-2" style="font-size:15px">'+precios+'</div></div>';
     if(B){
-      h+='<div class="tot-r" style="margin-top:6px"><div class="tot-k">Estimado'+tagd(okB)+'</div>'
-        +'<div class="tot-2" style="color:var(--accent)">'+miles(B.bolsas)+' bolsa'+(B.bolsas===1?"":"s")+'</div></div>';
-      extra+='<div class="tot-r"><div class="tot-k">Cálculo · '+fmt(t,3)+' m³ ÷ '+val(fmt(B.rinde,2)+' m³',okB)+'</div>'
+      extra+='<div class="tot-r"><div class="tot-k">Bolsas · '+fmt(t,3)+' m³ ÷ '+val(fmt(B.rinde,2)+' m³',okB)
+        +(c.sistema?' <em style="font-style:normal">('+esc(c.sistema)+')</em>':'')+'</div>'
         +'<div class="tot-2" style="color:var(--accent)">'+miles(B.bolsas)+'</div></div>';
       if(DB.celulosa.mostrarCosto){
         if(B.precio>0)
@@ -1712,8 +2246,7 @@ function renderTot(){
             +'<button class="tagdes" data-bolsa="precio">cargar</button></div></div>';
       }
     }else{
-      /* sin rinde congelado no se puede estimar: lo digo y ofrezco cargarlo */
-      h+='<div class="tot-r" style="margin-top:6px"><div class="tot-k">Estimado de bolsas</div>'
+      extra+='<div class="tot-r"><div class="tot-k">Bolsas</div>'
         +'<div class="tot-2" style="color:var(--muted);font-size:15px">falta el rinde'
         +'<button class="tagdes" data-bolsa="rinde">cargar</button></div></div>';
     }
@@ -1729,6 +2262,8 @@ function renderTot(){
       h+='<div class="tot-r"><div class="tot-k">'+esc(nom)+' · '+val(money0(pr)+' / '+T.u,okM)+tagd(okM)+'</div>'
         +'<div class="tot-2 clic" data-desc="1">'+money(imp)+'</div></div>';
       h+=filasDescuento(c);
+      var dlM=num(c.dolarSnap);
+      if(dlM>0) h+='<div class="rec-r usd"><span>en dólares</span><b>'+usd(totalACobrar(c)/dlM)+'</b></div>';
     }
     pie=esc(c.codigo||"")+' · '+esc(nom||"sin madera")+' · '
       +(pr>0?val(money0(pr)+" / "+T.u,okM):"precio no cargado")+' <em>('+fecha(c.precioFecha||c.fecha)+')</em>'
@@ -1739,15 +2274,24 @@ function renderTot(){
   var dl=num(c.dolarSnap), cobrar=totalACobrar(c);
   if(dl>0&&imp>0){
     var okD=!dolarDifiere(c);
-    extra+='<div class="tot-r"><div class="tot-k">Cotización '+val(money0(dl)+' / U$S',okD)+tagd(okD)
-      +(Math.abs(cobrar-imp)>0.005?' <em style="font-style:normal">(con descuento)</em>':'')+'</div>'
-      +'<div class="tot-2" style="color:#1f6b8f">'+usd(cobrar/dl)+'</div></div>';
+    /* el total en dólares ya está a la vista: acá solo queda la cotización usada */
+    extra+='<div class="tot-r"><div class="tot-k">Cotización '+val(money0(dl)+' / U$S',okD)+tagd(okD)+'</div>'
+      +'<div class="tot-2" style="color:var(--muted);font-size:15px">congelada</div></div>';
     if(c.tipo==="celulosa"&&DB.celulosa.mostrarCosto){ var B2=bolsasDe(c);
       if(B2&&B2.costo>0) extra+='<div class="tot-r"><div class="tot-k">Bolsas en dólares</div>'
         +'<div class="tot-2" style="color:#1f6b8f">'+usd(B2.costo/dl)+'</div></div>'; }
     pie+='<br>dólar '+val(money0(dl),okD)+' <em>('+fecha(c.dolarFecha||c.precioFecha||c.fecha)+')</em>';
   }else if(imp>0){
     extra+='<div class="tot-k" style="padding:4px 0">Sin cotización congelada. Cargala en <b>Config → Dólar</b> y actualizala desde el ⚙.</div>';
+  }
+  /* resumen del libro diario, solo si hay movimientos */
+  if(libroDe(c).length){
+    var rl=resumenLibro(c);
+    extra+='<div class="tot-r" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:8px">'
+      +'<div class="tot-k">Margen neto · '+libroDe(c).length+' movimiento'+(libroDe(c).length===1?"":"s")+'</div>'
+      +'<div class="tot-2" style="color:'+(rl.margen<0?"var(--danger)":"var(--ok)")+'">'+money(rl.margen)+'</div></div>'
+      +'<div class="tot-r"><div class="tot-k">Cobrado '+money0(rl.adelantos)+' · saldo</div>'
+      +'<div class="tot-2" style="color:'+(rl.saldo>0?"var(--danger)":"var(--muted)")+';font-size:16px">'+money(rl.saldo)+'</div></div>';
   }
   h+='<details class="masinfo" id="masinfo"'+(c.verInfo?" open":"")+'>'
     +'<summary>+ info · '+(c.tipo==="celulosa"?"costo de bolsas, dólar y fechas":"dólar y fechas de los precios")+'</summary>'
@@ -1865,12 +2409,13 @@ document.getElementById("btnNueva").onclick=function(){
   congelarPrecio(c);
   DB.cuentas.push(c); activeId=c.id; save();
   setPane("editor"); renderLista(); renderEditor();
-  /* al crearla, pide el cliente: se puede dejar vacío */
-  pedirTexto("Cliente","¿Para quién es este pedido? Podés dejarlo vacío y cargarlo después desde el ⚙.","",
-    function(v){ c.cliente=v; c.mod=ahora(); save(); renderCfg(); renderLista(); });
+  document.getElementById("inCliente").focus();   // el cliente se carga en el formulario
 };
 document.getElementById("inTitulo").oninput=function(){
-  var c=cuenta(); if(!c) return; c.titulo=this.value; c.mod=new Date().toISOString(); save(); renderLista();
+  var c=cuenta(); if(!c) return; c.titulo=this.value; c.mod=ahora(); save(); renderLista();
+};
+document.getElementById("inCliente").oninput=function(){
+  var c=cuenta(); if(!c) return; c.cliente=this.value; c.mod=ahora(); save(); renderLista();
 };
 window.addEventListener("resize",function(){ if(!esMobile()&&tab!=="config"&&activeId) setPane("editor"); });
 
