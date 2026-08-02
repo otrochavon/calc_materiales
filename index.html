@@ -278,6 +278,27 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
 .msg{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px;background:#fff;color:var(--ink);
      font:500 14.5px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;resize:vertical}
 .msg:focus{outline:2px solid var(--accent);outline-offset:-2px}
+/* elección de paleta y tipografía */
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.pal{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;
+     padding:8px 11px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;
+     display:flex;align-items:center;gap:7px}
+.pal.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft) inset}
+.pal-m{display:flex;gap:2px;flex:none}
+.pal-m i{width:11px;height:18px;border-radius:3px;display:block}
+/* vista previa del encabezado del presupuesto */
+.prev-png{margin-top:11px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.pp-h{display:flex;align-items:center;gap:9px;padding:10px 12px;color:#fff}
+.pp-h img{width:38px;height:38px;object-fit:contain;background:#fff;border-radius:5px;padding:2px;flex:none}
+.pp-h b{display:block;font-size:15px;font-weight:800;letter-spacing:.3px}
+.pp-h small{display:block;font-size:11px;opacity:.85}
+.pp-b{padding:10px 12px}
+.pp-t{display:flex;justify-content:space-between;align-items:baseline;font-size:17px;font-weight:800}
+.pp-t em{font-style:normal;font-size:11px;font-weight:500}
+.pp-l{border-top:1px solid;margin:9px 0 7px}
+.pp-l2{border-top:2px solid;margin:8px 0 6px}
+.pp-r{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;font-weight:700}
+.pp-fin{font-size:17px;font-weight:800}
 .logo-fila{display:flex;align-items:center;gap:9px}
 .logo-mini{width:56px;height:56px;object-fit:contain;border:1px solid var(--line);border-radius:9px;
            background:#fff;flex:none}
@@ -528,7 +549,7 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
    cambios grandes (4.0).
    ESTE MISMO NÚMERO va en el VERSION de sw.js. Uno solo, dos archivos.
    ============================================================ */
-var APP_VER="4.4";
+var APP_VER="4.6";
 
 /* ============================================================
    FÓRMULAS
@@ -642,6 +663,34 @@ function rindeDeSistema(n){
 DB.dolar=parseFloat(DB.dolar)||0;
 /* datos de la empresa para el presupuesto en imagen */
 DB.empresa=DB.empresa||{nombre:"",datos:"",logo:""};
+
+/* ---- paletas: cambian el color de toda la app y del presupuesto en imagen ---- */
+var PALETAS=[
+  {n:"Madera",  acc:"#7a4f24", soft:"#f0e4d6", bg:"#f5f1ec", ink:"#2a221d", line:"#e2d9cf", muted:"#8a7a6e", ok:"#2f7a4f", dang:"#b5423a"},
+  {n:"Pizarra", acc:"#33566e", soft:"#dfe9f0", bg:"#eef2f5", ink:"#1e2a33", line:"#d3dde4", muted:"#6f8290", ok:"#217a63", dang:"#b04a3c"},
+  {n:"Bosque",  acc:"#3d6b3a", soft:"#e0eddd", bg:"#eff3ed", ink:"#1f2a1e", line:"#d5e0d2", muted:"#758872", ok:"#2f7a4f", dang:"#b0483a"},
+  {n:"Ladrillo",acc:"#9a4230", soft:"#f6dfd7", bg:"#f7efeb", ink:"#2e1d18", line:"#e6d3cb", muted:"#957268", ok:"#2f7a4f", dang:"#a5342a"},
+  {n:"Grafito", acc:"#3f434a", soft:"#e4e6e9", bg:"#f2f3f5", ink:"#1c1e21", line:"#dadce0", muted:"#7c8189", ok:"#2f7a4f", dang:"#b5423a"}
+];
+var LETRAS=[
+  {n:"Sistema",    css:'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif'},
+  {n:"Serif",      css:'Georgia,"Noto Serif","Times New Roman",serif'},
+  {n:"Angosta",    css:'"Arial Narrow","Roboto Condensed","Noto Sans",sans-serif'},
+  {n:"Ticket",     css:'ui-monospace,"Roboto Mono",Menlo,Consolas,"Courier New",monospace'},
+  {n:"Redondeada", css:'"Trebuchet MS",Verdana,"Noto Sans",sans-serif'}
+];
+if(DB.empresa.paleta==null) DB.empresa.paleta=0;
+if(DB.empresa.letra==null)  DB.empresa.letra=0;
+function paletaAct(){ return PALETAS[DB.empresa.paleta]||PALETAS[0]; }
+function letraAct(){  return LETRAS[DB.empresa.letra]||LETRAS[0]; }
+function aplicarPaleta(){
+  var p=paletaAct(), r=document.documentElement.style;
+  r.setProperty("--accent",p.acc);      r.setProperty("--accent-soft",p.soft);
+  r.setProperty("--bg",p.bg);           r.setProperty("--ink",p.ink);
+  r.setProperty("--line",p.line);       r.setProperty("--muted",p.muted);
+  r.setProperty("--ok",p.ok);           r.setProperty("--danger",p.dang);
+  var m=document.querySelector('meta[name="theme-color"]'); if(m) m.content=p.acc;
+}
 [2,4,6].forEach(function(e){ if(DB.celulosa.precios[e]==null) DB.celulosa.precios[e]=0; });
 
 if(!DB.maderas.length){
@@ -965,13 +1014,55 @@ function renderEmpresa(){
     +(e.logo?'<button class="btn danger sm" id="btnLogoDel">Quitar</button>':'')
     +'</div></div>'
     +'<div class="mad-u">Aparecen arriba del presupuesto que se manda como <b>imagen</b>. '
-    +'El logo se achica solo y queda guardado en el teléfono, así que anda sin internet.</div></div>';
+    +'El logo se achica solo y queda guardado en el teléfono, así que anda sin internet.</div></div>'
+
+    +'<div class="sec">Paleta de colores</div><div class="mad">'
+    +'<div class="chips">'+PALETAS.map(function(p,i){
+        return '<button class="pal'+(i===DB.empresa.paleta?" on":"")+'" data-pal="'+i+'">'
+          +'<span class="pal-m"><i style="background:'+p.acc+'"></i><i style="background:'+p.soft+'"></i>'
+          +'<i style="background:'+p.ok+'"></i></span>'+p.n+'</button>';}).join("")
+    +'</div><div class="mad-u">Cambia el color de <b>toda la app</b> y del presupuesto en imagen.</div></div>'
+
+    +'<div class="sec">Tipografía del presupuesto</div><div class="mad">'
+    +'<div class="chips">'+LETRAS.map(function(l,i){
+        return '<button class="pal'+(i===DB.empresa.letra?" on":"")+'" data-let="'+i+'" '
+          +'style="font-family:'+l.css+'">'+l.n+'</button>';}).join("")
+    +'</div>'
+    +'<div class="prev-png" id="prevPng"></div>'
+    +'<div class="mad-u">Así se va a ver el encabezado de la imagen que le mandás al cliente.</div></div>';
   document.getElementById("emNom").oninput=function(){ DB.empresa.nombre=this.value; save(); };
   document.getElementById("emDat").oninput=function(){ DB.empresa.datos=this.value; save(); };
   document.getElementById("btnLogo").onclick=function(){ document.getElementById("fileLogo").click(); };
+  document.querySelectorAll("#empresaBd [data-pal]").forEach(function(b){
+    b.onclick=function(){ DB.empresa.paleta=+b.dataset.pal; save(); aplicarPaleta(); renderEmpresa(); };
+  });
+  document.querySelectorAll("#empresaBd [data-let]").forEach(function(b){
+    b.onclick=function(){ DB.empresa.letra=+b.dataset.let; save(); renderEmpresa(); };
+  });
+  prevPresupuesto();
   var bd=document.getElementById("btnLogoDel");
   if(bd) bd.onclick=function(){ DB.empresa.logo=""; save(); renderEmpresa(); toast("Logo quitado"); };
 }
+/* muestra en chico cómo va a quedar el encabezado de la imagen */
+function prevPresupuesto(){
+  var e=document.getElementById("prevPng"); if(!e) return;
+  var p=paletaAct(), L=letraAct().css, E=DB.empresa;
+  e.style.fontFamily=L;
+  e.innerHTML='<div class="pp-h" style="background:'+p.acc+'">'
+    +(E.logo?'<img src="'+E.logo+'">':'')
+    +'<div><b>'+esc((E.nombre||"Tu empresa").toUpperCase())+'</b>'
+    +'<small>'+esc((E.datos||"").split("\n")[0]||"datos de contacto")+'</small></div></div>'
+    +'<div class="pp-b" style="color:'+p.ink+'">'
+    +'<div class="pp-t">Presupuesto Tirantes<em style="color:'+p.muted+'">01/08/2026</em></div>'
+    +'<div style="color:'+p.acc+';font-weight:700;font-size:13px">Cod: T1 0801 Casa Belgrano · Cliente</div>'
+    +'<div class="pp-l" style="border-color:'+p.line+'"></div>'
+    +'<div class="pp-r"><span style="color:'+p.muted+'">Total del pedido</span>'
+    +'<b style="color:'+p.acc+'">144,36 pie²</b></div>'
+    +'<div class="pp-l2" style="border-color:'+p.acc+'"></div>'
+    +'<div class="pp-r"><span>TOTAL</span><b class="pp-fin" style="color:'+p.ok+'">$ 505.243,20</b></div>'
+    +'</div>';
+}
+
 /* achica el logo antes de guardarlo, para no llenar el almacenamiento */
 document.getElementById("fileLogo").onchange=function(){
   var f=this.files&&this.files[0]; this.value="";
@@ -1738,7 +1829,8 @@ function detalleSimple(c){
   (c.lineas||[]).forEach(function(l){
     var s;
     if(c.tipo==="rollizo")        s=fmt(l.d1,0)+"/"+fmt(l.d2,0)+" cm x "+fmt(l.L,2)+" m x "+miles(l.cant||1)+" u";
-    else if(c.tipo==="escuadria") s=fmt(l.alto,0)+'" x '+fmt(l.ancho,0)+'" x '+fmt(l.L,2)+" m x "+miles(l.cant||1)+" u";
+    else if(c.tipo==="escuadria") s=fmt(l.alto,0)+'" x '+fmt(l.ancho,0)+'" x '+fmt(l.L,2)
+                                     +" metros x "+miles(l.cant||1)+" unidades";
     else                          s=fmt(l.esp,0)+'" x '+fmt(l.m2,0)+" m2";
     if(l.desc) s+=" - "+l.desc;
     L.push(s);
@@ -1749,7 +1841,9 @@ function detalleSimple(c){
 /* ---- detalle 2: agrupado por medida, con subtotal de cada grupo ---- */
 function detalleAgrupado(c){
   var L=[];
-  var uni=(c.tipo==="celulosa")?"m2":"u", grupos={}, orden=[];
+  /* en tirantes escribo las unidades completas: hay lugar y se lee mejor */
+  var largo=(c.tipo==="escuadria");
+  var uni=(c.tipo==="celulosa")?"m2":(largo?"unidades":"u"), grupos={}, orden=[];
   (c.lineas||[]).forEach(function(l){
     var g,ord,det,cant;
     if(c.tipo==="rollizo"){
@@ -1757,7 +1851,7 @@ function detalleAgrupado(c){
       det=fmt(l.L,2)+" m"; cant=l.cant||1;
     }else if(c.tipo==="escuadria"){
       g=fmt(l.alto,0)+'" x '+fmt(l.ancho,0)+'"'; ord=[l.alto,l.ancho];
-      det=fmt(l.L,2)+" m"; cant=l.cant||1;
+      det=fmt(l.L,2)+" metros"; cant=l.cant||1;
     }else{
       g=fmt(l.esp,0)+'"'; ord=[l.esp,0];
       det=null; cant=l.m2;
@@ -1772,7 +1866,7 @@ function detalleAgrupado(c){
   });
   orden.forEach(function(g){
     var G=grupos[g];
-    L.push(g+" :   tot "+miles(G.tot)+" "+uni);
+    L.push(g+" :   "+(largo?"total ":"tot ")+miles(G.tot)+" "+uni);
     G.lista.map(function(k){return G.items[k];})
       .sort(function(a,b){return a.ord-b.ord;})
       .forEach(function(it){
@@ -1910,8 +2004,8 @@ function datosPresupuesto(c){
 function dibujarPresupuesto(c,cb){
   var E=DB.empresa||{}, dp=datosPresupuesto(c), T=TIPOS[c.tipo];
   var W=1080, P=64, S=2;                       // ancho fijo; S = escala de tipografías
-  var F='600 %spx -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif';
-  function f(px,peso){ return (peso||600)+" "+Math.round(px*S)+"px -apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif"; }
+  var PAL=paletaAct(), TIP=letraAct().css;
+  function f(px,peso){ return (peso||600)+" "+Math.round(px*S)+"px "+TIP; }
 
   var logo=null;
   function seguir(){
@@ -1920,10 +2014,10 @@ function dibujarPresupuesto(c,cb){
     var reng=[];
     /* L3: Presupuesto + calculadora · L4: código y cliente · L5: madera o sistema */
     reng.push({tipo:"titulo", alto:60});
-    var l4=["Cod: "+(c.codigo||"")];
-    if((c.titulo||"").trim()) l4.push((c.titulo||"").trim());
+    /* el código es tal cual lo que dice el campo Presupuesto */
+    var l4=["Cod: "+((c.titulo||"").trim()||c.codigo||"")];
     if(c.cliente) l4.push(c.cliente);
-    reng.push({tipo:"sub", txt:l4.join("  ·  "), alto:48, color:"#7a4f24", f:[17,700]});
+    reng.push({tipo:"sub", txt:l4.join("  ·  "), alto:48, color:PAL.acc, f:[17,700]});
 
     var l5=[];
     if(c.tipo==="celulosa"){ if(c.sistema) l5.push(c.sistema); }
@@ -1936,7 +2030,7 @@ function dibujarPresupuesto(c,cb){
         l5.push(miles(piezas(c))+" unidades");
       }
     }
-    if(l5.length) reng.push({tipo:"sub", txt:l5.join("  ·  "), alto:44, color:"#8a7a6e", f:[15,500]});
+    if(l5.length) reng.push({tipo:"sub", txt:l5.join("  ·  "), alto:44, color:PAL.muted, f:[15,500]});
     reng.push({tipo:"raya", alto:56});
     dp.filas.forEach(function(r){
       reng.push({tipo:r.sub?"subtotal":"fila", r:r, alto:r.sub?76:(r.grupo?68:60)});
@@ -1955,7 +2049,7 @@ function dibujarPresupuesto(c,cb){
     x.fillStyle="#ffffff"; x.fillRect(0,0,W,H);
 
     /* encabezado */
-    x.fillStyle="#7a4f24"; x.fillRect(0,0,W,hEnc);
+    x.fillStyle=PAL.acc; x.fillRect(0,0,W,hEnc);
     var tx=P;
     if(logo){
       var lh=logo.height*(120/Math.max(logo.width,logo.height)), lw=logo.width*(120/Math.max(logo.width,logo.height));
@@ -1976,42 +2070,42 @@ function dibujarPresupuesto(c,cb){
     reng.forEach(function(g){
       var b=yy+g.alto*0.66;                       // línea de base del renglón
       if(g.tipo==="titulo"){
-        x.fillStyle="#2a221d"; x.font=f(24,800);
+        x.fillStyle=PAL.ink; x.font=f(24,800);
         x.fillText("Presupuesto "+T.n, P, b);
-        x.font=f(15,500); x.fillStyle="#8a7a6e";
+        x.font=f(15,500); x.fillStyle=PAL.muted;
         x.textAlign="right"; x.fillText(fecha(c.fecha), W-P, b); x.textAlign="left";
       }else if(g.tipo==="sub"){
         x.fillStyle=g.color; x.font=f(g.f[0],g.f[1]);
         x.fillText(g.txt, P, b);
       }else if(g.tipo==="raya"){
-        x.strokeStyle="#e2d9cf"; x.lineWidth=2;
+        x.strokeStyle=PAL.line; x.lineWidth=2;
         x.beginPath(); x.moveTo(P,yy+g.alto/2); x.lineTo(W-P,yy+g.alto/2); x.stroke();
       }else if(g.tipo==="raya2"){
-        x.strokeStyle="#7a4f24"; x.lineWidth=4;
+        x.strokeStyle=PAL.acc; x.lineWidth=4;
         x.beginPath(); x.moveTo(P,yy+g.alto/2); x.lineTo(W-P,yy+g.alto/2); x.stroke();
       }else if(g.tipo==="fila"){
         var r=g.r;
-        x.fillStyle=r.grupo?"#2a221d":"#5c5049"; x.font=f(r.grupo?17:15,r.grupo?700:500);
+        x.fillStyle=r.grupo?PAL.ink:PAL.muted; x.font=f(r.grupo?17:15,r.grupo?700:500);
         x.fillText(r.k, P+(r.ind?26*S:0), b);
-        if(r.v){ x.textAlign="right"; x.fillStyle="#2a221d"; x.font=f(17,700);
+        if(r.v){ x.textAlign="right"; x.fillStyle=PAL.ink; x.font=f(17,700);
                  x.fillText(r.v,W-P,b); x.textAlign="left"; }
       }else if(g.tipo==="subtotal"){
         /* el subtotal de volumen va chico y pegado a la etiqueta:
            el protagonista de la imagen es siempre el precio final */
-        x.strokeStyle="#e2d9cf"; x.lineWidth=2;
+        x.strokeStyle=PAL.line; x.lineWidth=2;
         x.beginPath(); x.moveTo(P,yy+8); x.lineTo(W-P,yy+8); x.stroke();
-        x.fillStyle="#5c5049"; x.font=f(16,700);
+        x.fillStyle=PAL.muted; x.font=f(16,700);
         x.fillText(g.r.k,P,b+8);
         var anchoEt=x.measureText(g.r.k).width;
-        x.fillStyle="#7a4f24"; x.font=f(17,800);
+        x.fillStyle=PAL.acc; x.font=f(17,800);
         x.fillText(g.r.v, P+anchoEt+28, b+8);
       }else if(g.tipo==="total"){
         var t2=g.r;
-        x.fillStyle=t2.rojo?"#b5423a":(t2.usd?"#1f6b8f":"#5c5049");
+        x.fillStyle=t2.rojo?PAL.dang:(t2.usd?"#1f6b8f":PAL.muted);
         x.font=f(t2.fin?19:16,t2.fin?800:600);
         x.fillText(t2.k,P,b);
         x.textAlign="right";
-        x.fillStyle=t2.fin?"#2f7a4f":(t2.rojo?"#b5423a":(t2.usd?"#1f6b8f":"#2a221d"));
+        x.fillStyle=t2.fin?PAL.ok:(t2.rojo?PAL.dang:(t2.usd?"#1f6b8f":PAL.ink));
         x.font=f(t2.fin?26:17,t2.fin?800:700);
         x.fillText(t2.v,W-P,b); x.textAlign="left";
       }
@@ -2019,7 +2113,7 @@ function dibujarPresupuesto(c,cb){
     });
 
     /* pie */
-    x.fillStyle="#a8998e"; x.font=f(13,500); x.textAlign="center";
+    x.fillStyle=PAL.muted; x.font=f(13,500); x.textAlign="center";
     x.fillText("Presupuesto emitido el "+fechaH(new Date().toISOString())+" · "+T.n, W/2, H-34);
     x.textAlign="left";
     cb(cv);
@@ -2428,6 +2522,7 @@ window.addEventListener("resize",function(){ if(!esMobile()&&tab!=="config"&&act
   ].forEach(function(t){console.log((ok(t[1],t[2])?"OK  ":"FAIL")+"  "+t[0]+" = "+t[1].toFixed(4));});
 })();
 
+aplicarPaleta();
 document.getElementById("appVer").textContent="v "+APP_VER;
 document.getElementById("appVer").onclick=buscarActualizacion;
 save();
