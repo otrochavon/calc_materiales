@@ -90,6 +90,8 @@ button{font:inherit}
      justify-content:space-between;gap:9px;align-items:center}
 .acc.on{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
 .acc-t{font-weight:600;font-size:16.5px;word-break:break-word}
+.est{display:inline-block;border-radius:20px;padding:1px 8px;font-size:11.5px;font-weight:800;
+     vertical-align:2px;white-space:nowrap}
 .acc-cli{color:var(--accent);font-weight:800}
 .acc-cli::before{content:"· "}
 .acc-m{font-size:13.5px;color:var(--muted);margin-top:2px}
@@ -119,6 +121,8 @@ button{font:inherit}
       font:inherit;background:#fff;color:var(--ink)}
 .madrow #inTitulo{flex:1 1 58%;font-size:16px;font-weight:700}
 .madrow #inCliente{flex:1 1 42%;font-size:15px;font-weight:600}
+#selEstado{flex:none;border:1px solid #d8c6ae;border-radius:20px;padding:6px 6px;font:inherit;
+           font-size:12.5px;font-weight:800;background:#fff;text-align:center;max-width:104px}
 /* segundo renglón: madera o sistema, más los dos botones */
 .madrow2{flex:none;display:flex;align-items:center;gap:6px;padding:0 8px 6px;
          background:var(--accent-soft);border-bottom:1px solid var(--line)}
@@ -251,6 +255,9 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
 .sub{flex:0 0 auto;border:1px solid var(--line);background:#fff;color:var(--muted);
      border-radius:9px;padding:9px 13px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
 .sub.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.subtabs.sub2{padding-top:0;border-bottom:1px solid var(--line)}
+.sub.chico{padding:6px 11px;font-size:13px;border-radius:20px}
+.sub.chico.on{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
 .padbox{padding:10px 12px;border-bottom:1px solid var(--line)}
 .sec{background:#ece1d4;padding:9px 12px;font-size:13px;font-weight:800;letter-spacing:.6px;
      text-transform:uppercase;color:var(--accent);border-bottom:1px solid var(--line);
@@ -279,6 +286,17 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
      font:500 14.5px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;resize:vertical}
 .msg:focus{outline:2px solid var(--accent);outline-offset:-2px}
 /* elección de paleta y tipografía */
+/* redondeo */
+.red-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.red-t{flex:1;min-width:130px}
+.red-t b{display:block;font-size:15.5px}
+.red-t small{display:block;font-size:12px;color:var(--muted)}
+.red-n{display:flex;gap:5px;flex:none}
+.dec{width:38px;height:38px;border:1px solid var(--line);background:#fff;color:var(--ink);
+     border-radius:9px;font:inherit;font-size:16px;font-weight:800;cursor:pointer}
+.dec.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.red-e{flex:none;min-width:118px;text-align:right;font-weight:800;font-size:16px;color:var(--accent);
+       font-variant-numeric:tabular-nums}
 .chips{display:flex;flex-wrap:wrap;gap:7px}
 .pal{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;
      padding:8px 11px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;
@@ -398,20 +416,23 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
     <div class="pane-hd">
       <span id="listaTit">Cuentas</span>
       <input type="search" id="inBuscar" placeholder="Buscar…" autocomplete="off" enterkeyhint="search">
+      <button class="icobtn" id="btnArch" title="Ver el archivo">🗃</button>
       <button class="icobtn" id="btnSel" title="Seleccionar varias">☑</button>
     </div>
     <div class="pane-bd" id="listaBd"></div>
     <div class="bar" id="barNormal"><button class="btn wide" id="btnNueva">+ Nueva cuenta</button></div>
     <div class="bar" id="barSel" hidden>
       <button class="btn ghost sm" id="btnTodas">Todas</button>
+      <button class="btn sm" id="btnArchivarSel">Archivar</button>
       <button class="btn danger sm" id="btnBorrarSel">Borrar</button>
-      <button class="btn ghost sm" id="btnCancelSel">Cancelar</button>
+      <button class="btn ghost sm" id="btnCancelSel">✕</button>
     </div>
   </section>
 
   <section class="pane" id="editor">
     <div class="madrow" id="madRow">
       <input id="inTitulo" placeholder="Presupuesto" autocomplete="off">
+      <select id="selEstado" title="Estado del presupuesto"></select>
       <input id="inCliente" placeholder="Cliente" autocomplete="off">
     </div>
     <div class="madrow2" id="madRow2">
@@ -434,13 +455,20 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
   <section class="pane" id="config">
     <div class="pane-hd"><span>Configuración y precios</span></div>
     <div class="subtabs">
-      <button class="sub on" data-sub="madera">Madera</button>
-      <button class="sub" data-sub="celulosa">Celulosa</button>
-      <button class="sub" data-sub="empresa">Empresa</button>
-      <button class="sub" data-sub="mensajes">Mensajes</button>
-      <button class="sub" data-sub="rotulos">Rótulos</button>
-      <button class="sub" data-sub="dolar">Dólar</button>
-      <button class="sub" data-sub="datos">Respaldo</button>
+      <button class="sub on" data-gr="precios">Precios</button>
+      <button class="sub" data-gr="person">Personalizar</button>
+      <button class="sub" data-gr="respaldo">Respaldo</button>
+    </div>
+    <div class="subtabs sub2" id="sub2Precios">
+      <button class="sub chico on" data-sub="madera">Madera</button>
+      <button class="sub chico" data-sub="celulosa">Celulosa</button>
+      <button class="sub chico" data-sub="dolar">Dólar</button>
+      <button class="sub chico" data-sub="redondeo">Redondeo</button>
+    </div>
+    <div class="subtabs sub2" id="sub2Person" hidden>
+      <button class="sub chico on" data-sub="empresa">Empresa</button>
+      <button class="sub chico" data-sub="mensajes">Mensajes</button>
+      <button class="sub chico" data-sub="rotulos">Prefijos</button>
     </div>
     <div class="pane-bd">
       <div id="cfgMadera">
@@ -468,6 +496,9 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
       </div>
       <div id="cfgDolar" hidden>
         <div id="dolarBd"></div>
+      </div>
+      <div id="cfgRedondeo" hidden>
+        <div id="redondeoBd"></div>
       </div>
       <div id="cfgDatos" hidden>
         <div id="datosBd"></div>
@@ -549,7 +580,7 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
    cambios grandes (4.0).
    ESTE MISMO NÚMERO va en el VERSION de sw.js. Uno solo, dos archivos.
    ============================================================ */
-var APP_VER="4.6";
+var APP_VER="5.0";
 
 /* ============================================================
    FÓRMULAS
@@ -661,6 +692,11 @@ function rindeDeSistema(n){
   return num((s[0]||{}).rinde);
 }
 DB.dolar=parseFloat(DB.dolar)||0;
+/* cotización automática desde dolarapi.com (gratis, sin registro) */
+DB.dolarAuto=DB.dolarAuto||{activo:false, casa:"blue", campo:"venta", ultima:"", nombre:""};
+var CASAS=[["oficial","Oficial"],["blue","Blue"],["bolsa","MEP / Bolsa"],
+           ["contadoconliqui","Contado con liqui"],["mayorista","Mayorista"],
+           ["cripto","Cripto"],["tarjeta","Tarjeta"]];
 /* datos de la empresa para el presupuesto en imagen */
 DB.empresa=DB.empresa||{nombre:"",datos:"",logo:""};
 
@@ -724,8 +760,20 @@ ORDEN_TIPOS.forEach(function(tp){
 function save(){ try{localStorage.setItem(KEY,JSON.stringify(DB));}catch(e){alert("No se pudo guardar en este navegador.");} }
 
 var tab="rollizo", tipo="rollizo", activeId=null, selMode=false, selIds={}, formPin=false;
+var verArchivo=false;                       // la lista muestra el archivo o las cuentas vivas
 function esMobile(){ return window.matchMedia ? window.matchMedia("(max-width:760px)").matches : window.innerWidth<=760; }
 function setPane(p){ document.body.dataset.pane=p; }
+
+/* ---------- redondeo: cuántos decimales se muestran ----------
+   La cuenta se hace siempre con precisión completa y se redondea
+   recién al mostrar. Con 0 decimales no aparece la coma.          */
+DB.redondeo=DB.redondeo||{};
+[["plata",2],["m3",3],["pie",2],["m2",0]].forEach(function(x){
+  if(DB.redondeo[x[0]]==null) DB.redondeo[x[0]]=x[1];
+});
+function decDe(k){ var d=parseInt(DB.redondeo[k],10); return isFinite(d)?Math.max(0,Math.min(4,d)):0; }
+function decPlata(){ return decDe("plata"); }
+function decU(u){ return u==="pie²" ? decDe("pie") : (u==="m²" ? decDe("m2") : decDe("m3")); }
 
 /* ---------- helpers ---------- */
 function num(v){var n=parseFloat((""+v).replace(",",".").trim());return isFinite(n)?n:0;}
@@ -754,8 +802,8 @@ function autoMiles(el){
 }
 function rd(v,d){var m=Math.pow(10,d);return Math.round(v*m)/m;}
 function fmt(n,d){return n.toLocaleString("es-AR",{minimumFractionDigits:d,maximumFractionDigits:d});}
-function money(n){return "$ "+n.toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2});}
-function money0(n){return "$ "+n.toLocaleString("es-AR",{maximumFractionDigits:2});}
+function money(n){var d=decPlata();return "$ "+n.toLocaleString("es-AR",{minimumFractionDigits:d,maximumFractionDigits:d});}
+function money0(n){return money(n);}   /* mismo redondeo en toda la app */
 function fecha(iso){var d=new Date(iso);return d.toLocaleDateString("es-AR",{day:"2-digit",month:"2-digit",year:"numeric"});}
 function fechaH(iso){var d=new Date(iso);return fecha(iso)+" "+d.toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit",hour12:false})+" hs";}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
@@ -807,7 +855,7 @@ function espDifiere(c){
   var s=c.preciosSnap||{};
   return espesoresUnion(c).some(function(e){ return Math.abs(num(s[e])-num(DB.celulosa.precios[e]))>0.005; });
 }
-function usd(n){ return "U$S "+n.toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function usd(n){ var d=decPlata(); return "U$S "+n.toLocaleString("es-AR",{minimumFractionDigits:d,maximumFractionDigits:d}); }
 /* bolsas necesarias y su costo, con los valores congelados en la cuenta */
 function bolsasDe(c){
   var b=c.bolsaSnap||{}, rinde=num(b.rinde), pr=num(b.precio), t=totalCuenta(c);
@@ -818,13 +866,19 @@ function bolsasDe(c){
 
 /* ---------- rótulo ---------- */
 var MESES3=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+function dosD(n){ return ("0"+n).slice(-2); }
 var FORMATOS_FECHA={
-  MMDD:  {n:"0731 — mes y día",             f:function(d){return ("0"+(d.getMonth()+1)).slice(-2)+("0"+d.getDate()).slice(-2);}},
-  MMMDD: {n:"jul-31 — mes abreviado y día", f:function(d){return MESES3[d.getMonth()]+"-"+("0"+d.getDate()).slice(-2);}}
+  NADA:  {n:"sin fecha — solo el prefijo", f:function(){ return ""; }},
+  MMDD:  {n:"0731 — mes y día",            f:function(d){return dosD(d.getMonth()+1)+dosD(d.getDate());}},
+  MMMDD: {n:"jul-31 — mes abreviado",      f:function(d){return MESES3[d.getMonth()]+"-"+dosD(d.getDate());}},
+  AAMMDD:{n:"260731 — año, mes y día",     f:function(d){return dosD(d.getFullYear()%100)+dosD(d.getMonth()+1)+dosD(d.getDate());}}
 };
 function fechaRot(d){ return (FORMATOS_FECHA[DB.rotulo.fecha]||FORMATOS_FECHA.MMDD).f(d||new Date()); }
 function prefijoDe(tp){ return (DB.rotulo.prefijo[tp]||"").toUpperCase(); }
-function rotulo(tp,n,d){ return prefijoDe(tp)+n+" "+fechaRot(d); }
+/* número inicial por calculadora: solo manda para las cuentas nuevas */
+function desdeDe(tp){ var v=parseInt((DB.rotulo.desde||{})[tp],10); return isFinite(v)&&v>0?v:1; }
+function proximoNum(tp){ return Math.max(desdeDe(tp),(DB.contadores[tp]||0)+1); }
+function rotulo(tp,n,d){ var f=fechaRot(d); return prefijoDe(tp)+n+(f?" "+f:""); }
 
 /* ---------- cálculo ---------- */
 function volLinea(c,l){
@@ -1050,7 +1104,7 @@ function prevPresupuesto(){
   e.style.fontFamily=L;
   e.innerHTML='<div class="pp-h" style="background:'+p.acc+'">'
     +(E.logo?'<img src="'+E.logo+'">':'')
-    +'<div><b>'+esc((E.nombre||"Tu empresa").toUpperCase())+'</b>'
+    +'<div><b>'+esc(E.nombre||"Tu empresa")+'</b>'
     +'<small>'+esc((E.datos||"").split("\n")[0]||"datos de contacto")+'</small></div></div>'
     +'<div class="pp-b" style="color:'+p.ink+'">'
     +'<div class="pp-t">Presupuesto Tirantes<em style="color:'+p.muted+'">01/08/2026</em></div>'
@@ -1141,35 +1195,153 @@ function renderMensajes(){
    CONFIG — rótulo
    ============================================================ */
 function renderRotulo(){
-  document.getElementById("rotuloBd").innerHTML='<div class="rot">'
-    +'<div class="mad-p">'
-    +ORDEN_TIPOS.map(function(tp){
-       return '<div class="f"><label>Prefijo '+TIPOS[tp].n.toLowerCase()+'</label>'
-         +'<input class="pf" data-tp="'+tp+'" maxlength="4" value="'+esc(prefijoDe(tp))+'" placeholder="'+PREF_DEF[tp]+'"></div>';}).join("")
-    +'</div>'
-    +'<div class="f"><label>Fecha en el rótulo</label><select id="selFecha">'
+  DB.rotulo.desde=DB.rotulo.desde||{};
+  document.getElementById("rotuloBd").innerHTML=
+    ORDEN_TIPOS.map(function(tp){
+      return '<div class="mad pfx" data-tp="'+tp+'">'
+        +'<div class="mad-p" style="grid-template-columns:1fr 1fr auto;align-items:end">'
+        +'<div class="f"><label>Prefijo</label>'
+        +'<input class="pf" maxlength="4" value="'+esc(prefijoDe(tp))+'" placeholder="'+PREF_DEF[tp]+'"></div>'
+        +'<div class="f"><label>Numerar desde</label>'
+        +'<input class="pd" inputmode="numeric" value="'+desdeDe(tp)+'"></div>'
+        +'<button class="btn ghost sm pr-reset">Reiniciar</button>'
+        +'</div>'
+        +'<div class="mad-u"><b>'+TIPOS[tp].n+'</b> · próxima: <b class="pf-ej" style="color:var(--accent)"></b>'
+        +'  ·  llevás <b>'+(DB.contadores[tp]||0)+'</b></div></div>';
+    }).join("")
+    +'<div class="mad"><div class="f"><label>Fecha dentro del código</label><select id="selFecha">'
     +Object.keys(FORMATOS_FECHA).map(function(k){
         return '<option value="'+k+'"'+(DB.rotulo.fecha===k?" selected":"")+'>'+FORMATOS_FECHA[k].n+'</option>';}).join("")
     +'</select></div><div class="prev" id="rotPrev"></div></div>';
+
   function prev(){
+    document.querySelectorAll("#rotuloBd .pfx").forEach(function(row){
+      row.querySelector(".pf-ej").textContent=rotulo(row.dataset.tp,proximoNum(row.dataset.tp));
+    });
     document.getElementById("rotPrev").innerHTML=
-      ORDEN_TIPOS.map(function(tp){
-        return 'Próxima de '+TIPOS[tp].n.toLowerCase()+': <b>'+esc(rotulo(tp,DB.contadores[tp]+1))+'</b>';}).join("<br>")
-      +'<br><span style="font-size:12.5px">Después del rótulo podés escribir lo que quieras (cliente, lote). Los títulos ya guardados no cambian.</span>';
+      'Así se compone el código automático:<br>'
+      +ORDEN_TIPOS.map(function(tp){
+        return '<b>'+esc(rotulo(tp,proximoNum(tp)))+'</b>';}).join("  ·  ")
+      +'<br><span style="font-size:12.5px">Prefijo + número + fecha. Después escribís lo que quieras (cliente, obra). '
+      +'Los títulos ya guardados no cambian.</span>';
   }
-  document.querySelectorAll("#rotuloBd .pf").forEach(function(el){
-    el.oninput=function(){ DB.rotulo.prefijo[el.dataset.tp]=el.value.toUpperCase(); save(); prev(); };
+  document.querySelectorAll("#rotuloBd .pfx").forEach(function(row){
+    var tp=row.dataset.tp;
+    row.querySelector(".pf").oninput=function(){ DB.rotulo.prefijo[tp]=this.value.toUpperCase(); save(); prev(); };
+    row.querySelector(".pd").oninput=function(){
+      var v=parseInt(this.value,10); DB.rotulo.desde[tp]=(isFinite(v)&&v>0)?v:1; save(); prev();
+    };
+    row.querySelector(".pr-reset").onclick=function(){
+      if(!confirm("¿Reiniciar el contador de "+TIPOS[tp].n+"?\n\nLa próxima cuenta va a numerarse desde "
+                  +desdeDe(tp)+".\nLas cuentas que ya existen no se tocan, así que pueden repetirse códigos.")) return;
+      DB.contadores[tp]=0; save(); renderRotulo(); toast("Contador reiniciado");
+    };
   });
   document.getElementById("selFecha").onchange=function(){ DB.rotulo.fecha=this.value; save(); prev(); };
   prev();
 }
+/* Baja la cotización de dolarapi.com. Solo toca el valor de Config:
+   las cuentas ya creadas conservan el dólar que congelaron. */
+function bajarDolar(cb){
+  if(!window.fetch){ cb&&cb(false,"este navegador no puede"); return; }
+  var A=DB.dolarAuto;
+  fetch("https://dolarapi.com/v1/dolares",{cache:"no-store"})
+    .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+    .then(function(lista){
+      var c=null;
+      (lista||[]).forEach(function(x){ if(x.casa===A.casa) c=x; });
+      if(!c) throw 0;
+      var v = A.campo==="promedio"
+              ? (parseFloat(c.compra)+parseFloat(c.venta))/2
+              : parseFloat(c[A.campo]);
+      if(!(v>0)) throw 0;
+      v=Math.round(v*100)/100;
+      DB.dolar=v; A.ultima=ahora(); A.nombre=c.nombre; save();
+      cb&&cb(true,v);
+    })
+    .catch(function(){ cb&&cb(false,"no se pudo conectar"); });
+}
+
 function renderDolar(){
   document.getElementById("dolarBd").innerHTML='<div class="mad"><div class="f">'
     +'<label>Cotización del dólar ($ por U$S 1)</label>'
     +'<input id="inDolar" class="txt" inputmode="decimal" value="'+(DB.dolar?miles(DB.dolar):"")+'" placeholder="0" style="text-align:right;font-weight:700;font-size:19px">'
-    +'</div><div class="mad-u">Con esto, cada cuenta puede mostrar su importe en dólares tildando la casilla al pie. La cotización se congela al crear la cuenta.</div></div>';
+    +'</div><div class="mad-u">Cada cuenta congela esta cotización al crearse. Actualizarla acá no cambia las cuentas viejas.</div></div>'
+
+    +'<div class="sec">Cotización automática</div><div class="mad">'
+    +'<label class="chk" style="margin-top:0;border:0;padding-top:0">'
+    +'<input type="checkbox" id="dAuto"'+(DB.dolarAuto.activo?" checked":"")+'>'
+    +' Actualizar sola al abrir la app</label>'
+    +'<div class="mad-p" style="margin-top:9px">'
+    +'<div class="f"><label>Qué dólar</label><select id="dCasa">'
+    +CASAS.map(function(c){return '<option value="'+c[0]+'"'+(DB.dolarAuto.casa===c[0]?" selected":"")+'>'+c[1]+'</option>';}).join("")
+    +'</select></div>'
+    +'<div class="f"><label>Valor</label><select id="dCampo">'
+    +'<option value="venta"'+(DB.dolarAuto.campo==="venta"?" selected":"")+'>Venta</option>'
+    +'<option value="compra"'+(DB.dolarAuto.campo==="compra"?" selected":"")+'>Compra</option>'
+    +'<option value="promedio"'+(DB.dolarAuto.campo==="promedio"?" selected":"")+'>Promedio</option>'
+    +'</select></div></div>'
+    +'<div class="padbox" style="padding:10px 0 0;border:0"><button class="btn wide ghost" id="dAhora">⟳ Actualizar ahora</button></div>'
+    +'<div class="mad-u" id="dInfo"></div></div>';
+
+  function info(){
+    var A=DB.dolarAuto;
+    document.getElementById("dInfo").innerHTML=
+      (A.ultima?'Última bajada: <b>'+fechaH(A.ultima)+'</b>'+(A.nombre?' · '+esc(A.nombre):'')
+              :'Todavía no se bajó ninguna cotización.')
+      +'<br>Fuente: <b>dolarapi.com</b>, gratis y sin registro. Necesita señal solo en ese momento; '
+      +'si no hay internet, la app sigue con el último valor.';
+  }
   document.getElementById("inDolar").oninput=function(){ DB.dolar=autoMiles(this); save(); };
+  document.getElementById("dAuto").onchange=function(){ DB.dolarAuto.activo=this.checked; save(); };
+  document.getElementById("dCasa").onchange=function(){ DB.dolarAuto.casa=this.value; save(); };
+  document.getElementById("dCampo").onchange=function(){ DB.dolarAuto.campo=this.value; save(); };
+  document.getElementById("dAhora").onclick=function(){
+    var b=this; b.disabled=true; b.textContent="Buscando…";
+    bajarDolar(function(ok,v){
+      b.disabled=false; b.textContent="⟳ Actualizar ahora";
+      if(ok){ renderDolar(); toast("Dólar: "+money0(v)); }
+      else toast("No se pudo actualizar ("+v+")");
+    });
+  };
+  info();
 }
+/* ============================================================
+   CONFIG — redondeo
+   ============================================================ */
+var REDON=[["plata","Plata","importes, precios y cotización",3141.5926,function(n,d){return "$ "+n.toLocaleString("es-AR",{minimumFractionDigits:d,maximumFractionDigits:d});}],
+           ["m3","Metros cúbicos","rollizos y volumen de celulosa",3.8746,function(n,d){return fmt(n,d)+" m³";}],
+           ["pie","Pies cuadrados","tirantes",144.3552,function(n,d){return fmt(n,d)+" pie²";}],
+           ["m2","Metros cuadrados","superficie de celulosa",185.5,function(n,d){return fmt(n,d)+" m²";}]];
+function renderRedondeo(){
+  document.getElementById("redondeoBd").innerHTML=
+    REDON.map(function(r){
+      return '<div class="mad red-r" data-k="'+r[0]+'">'
+        +'<div class="red-t"><b>'+r[1]+'</b><small>'+r[2]+'</small></div>'
+        +'<div class="red-n">'
+        +[0,1,2,3].map(function(d){
+            return '<button class="dec'+(decDe(r[0])===d?" on":"")+'" data-d="'+d+'">'+d+'</button>';}).join("")
+        +'</div><div class="red-e" id="red_'+r[0]+'"></div></div>';
+    }).join("")
+    +'<div class="mad"><div class="mad-u">La cuenta se hace siempre con toda la precisión: el redondeo es <b>solo al mostrar</b>, '
+    +'así los totales nunca quedan desfasados. Con <b>0</b> decimales desaparece la coma.</div></div>';
+  function ej(){
+    REDON.forEach(function(r){ document.getElementById("red_"+r[0]).textContent=r[4](r[3],decDe(r[0])); });
+  }
+  document.querySelectorAll("#redondeoBd .red-r").forEach(function(row){
+    row.querySelectorAll("[data-d]").forEach(function(b){
+      b.onclick=function(){
+        DB.redondeo[row.dataset.k]=+b.dataset.d; save();
+        row.querySelectorAll("[data-d]").forEach(function(x){x.classList.toggle("on",x===b);});
+        ej();
+        if(activeId){ renderLineas(); renderTot(); }
+        renderLista();
+      };
+    });
+  });
+  ej();
+}
+
 /* ============================================================
    CONFIG — respaldo: exportar / restaurar / fusionar
    ============================================================ */
@@ -1330,17 +1502,34 @@ function renderSistemas(){
     if(ns.length) ns[ns.length-1].focus();
   };
 }
-function renderConfig(){ renderMaderas(); renderCelulosa(); renderBolsa(); renderSistemas(); renderEmpresa(); renderMensajes(); renderRotulo(); renderDolar(); renderDatos(); }
+function renderConfig(){ renderMaderas(); renderCelulosa(); renderBolsa(); renderSistemas(); renderEmpresa();
+  renderMensajes(); renderRotulo(); renderDolar(); renderRedondeo(); renderDatos(); }
 /* sub-solapas de Config */
-document.querySelectorAll(".sub").forEach(function(b){
-  b.onclick=function(){
-    document.querySelectorAll(".sub").forEach(function(x){x.classList.remove("on");});
-    b.classList.add("on");
-    var m={madera:"cfgMadera",celulosa:"cfgCelulosa",empresa:"cfgEmpresa",mensajes:"cfgMensajes",
-           rotulos:"cfgRotulos",dolar:"cfgDolar",datos:"cfgDatos"};
-    Object.keys(m).forEach(function(k){ document.getElementById(m[k]).hidden=(k!==b.dataset.sub); });
-    document.querySelector("#config .pane-bd").scrollTop=0;
-  };
+/* Config en dos niveles: grupo arriba, sección adentro */
+var PANELES={madera:"cfgMadera",celulosa:"cfgCelulosa",dolar:"cfgDolar",redondeo:"cfgRedondeo",
+             empresa:"cfgEmpresa",mensajes:"cfgMensajes",rotulos:"cfgRotulos",datos:"cfgDatos"};
+var GRUPOS={precios:{fila:"sub2Precios",def:"madera"},
+            person:{fila:"sub2Person",def:"empresa"},
+            respaldo:{fila:null,def:"datos"}};
+function verSeccion(sec){
+  Object.keys(PANELES).forEach(function(k){ document.getElementById(PANELES[k]).hidden=(k!==sec); });
+  document.querySelectorAll("#config .sub2 .sub").forEach(function(x){
+    x.classList.toggle("on",x.dataset.sub===sec);
+  });
+  document.querySelector("#config .pane-bd").scrollTop=0;
+}
+function verGrupo(gr){
+  document.querySelectorAll("#config [data-gr]").forEach(function(x){ x.classList.toggle("on",x.dataset.gr===gr); });
+  Object.keys(GRUPOS).forEach(function(k){
+    var f=GRUPOS[k].fila; if(f) document.getElementById(f).hidden=(k!==gr);
+  });
+  verSeccion(GRUPOS[gr].def);
+}
+document.querySelectorAll("#config [data-gr]").forEach(function(b){
+  b.onclick=function(){ verGrupo(b.dataset.gr); };
+});
+document.querySelectorAll("#config .sub2 .sub").forEach(function(b){
+  b.onclick=function(){ verSeccion(b.dataset.sub); };
 });
 
 /* ============================================================
@@ -1348,14 +1537,31 @@ document.querySelectorAll(".sub").forEach(function(b){
    ============================================================ */
 function selCount(){ return Object.keys(selIds).filter(function(k){return selIds[k];}).length; }
 
+/* ---------- estado del presupuesto ---------- */
+var ESTADOS=[["espera","en espera","#c9901a","#fdf1d8"],
+             ["curso","en curso","#2f7a4f","#e3f1e8"],
+             ["cerrado","cerrado","#6c7076","#e8eaec"],
+             ["cancelado","cancelado","#b5423a","#fbe4e2"]];
+function estadoDe(c){
+  var e=c.estado||"espera";
+  for(var i=0;i<ESTADOS.length;i++) if(ESTADOS[i][0]===e) return ESTADOS[i];
+  return ESTADOS[0];
+}
+
 /* ---------- búsqueda: primero por título, después por descripción ---------- */
 var filtro="";
 function norm(s){ return (""+s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
 function cuentasFiltradas(){
-  var cs=delCuentas();
+  /* la vista de archivo muestra las archivadas; la normal, las demás */
+  var cs=delCuentas().filter(function(c){ return !!c.archivada===verArchivo; });
   cs.sort(function(a,b){ return (b.mod||b.fecha).localeCompare(a.mod||a.fecha); });
   var q=norm(filtro).trim();
   if(!q) return cs.map(function(c){ return {c:c,hit:null}; });
+  /* escribir «en curso», «cerrado», etc. filtra por estado */
+  var porEstado=null;
+  ESTADOS.forEach(function(e){ if(norm(e[1]).indexOf(q)===0||norm(e[0]).indexOf(q)===0) porEstado=e[0]; });
+  if(porEstado) return cs.filter(function(c){ return estadoDe(c)[0]===porEstado; })
+                         .map(function(c){ return {c:c,hit:null}; });
   var porTitulo=[], porDesc=[];
   cs.forEach(function(c){
     if(norm(c.titulo||"").indexOf(q)>=0){ porTitulo.push({c:c,hit:null}); return; }
@@ -1366,17 +1572,21 @@ function cuentasFiltradas(){
   });
   return porTitulo.concat(porDesc);
 }
-function ajustarContadores(){
-  ORDEN_TIPOS.forEach(function(tp){
-    if(!DB.cuentas.some(function(c){return c.tipo===tp;})) DB.contadores[tp]=0;
-  });
-}
+/* el contador ya no se reinicia solo al borrar: hay un botón en Config → Prefijos */
 function renderLista(){
-  var box=document.getElementById("listaBd"), todas=delCuentas(), res=cuentasFiltradas();
+  var box=document.getElementById("listaBd"), res=cuentasFiltradas();
+  var todas=delCuentas().filter(function(c){ return !!c.archivada===verArchivo; });
+  var enArchivo=delCuentas().filter(function(c){ return !!c.archivada; }).length;
   document.getElementById("listaTit").textContent=
-    TIPOS[tipo].n+" · "+(filtro.trim()? miles(res.length)+"/"+miles(todas.length) : miles(todas.length));
+    (verArchivo?"Archivo · ":"")+TIPOS[tipo].n+" · "
+    +(filtro.trim()? miles(res.length)+"/"+miles(todas.length) : miles(todas.length));
+  var ba=document.getElementById("btnArch");
+  ba.classList.toggle("on",verArchivo);
+  ba.title=verArchivo?"Volver a los presupuestos":"Ver el archivo ("+enArchivo+")";
+  ba.style.visibility=(enArchivo||verArchivo)?"visible":"hidden";
   var bs=document.getElementById("btnSel");
   bs.classList.toggle("on",selMode); bs.style.visibility=todas.length?"visible":"hidden";
+  document.getElementById("btnArchivarSel").textContent=verArchivo?"Desarchivar":"Archivar";
   document.getElementById("barNormal").hidden=selMode;
   document.getElementById("barSel").hidden=!selMode;
   if(selMode){
@@ -1388,24 +1598,39 @@ function renderLista(){
   if(!todas.length){ box.innerHTML='<div class="empty">Todavía no hay cuentas.<br>Tocá <b>+ Nueva cuenta</b> para empezar.</div>'; return; }
   if(!res.length){ box.innerHTML='<div class="empty">Ninguna cuenta coincide con<br><b>'+esc(filtro)+'</b></div>'; return; }
   box.innerHTML=res.map(function(r){
-    var c=r.c, t=totalCuenta(c), n=piezas(c), T=TIPOS[c.tipo], imp=totalACobrar(c), D=descuentoDe(c);
+    var c=r.c, t=totalCuenta(c), n=piezas(c), T=TIPOS[c.tipo], imp=totalACobrar(c), D=descuentoDe(c), E=estadoDe(c);
     var marca=(D&&Math.abs(D.monto)>0.005)
       ? '<span class="acc-desc">'+(D.monto<0?"+":"−")+pctTxt(Math.abs(D.pct))+'</span>' : "";
     var izq = T.madera ? (c.maderaNombre||(madera(c.maderaId)||{}).nombre||"sin madera")
-                       : fmt((c.lineas||[]).reduce(function(s,l){return s+l.m2;},0),0)+" m²";
+                       : fmt((c.lineas||[]).reduce(function(s,l){return s+l.m2;},0),decDe("m2"))+" m²";
     return '<div class="acc'+(c.id===activeId&&!selMode?" on":"")+'" data-id="'+c.id+'">'
       +(selMode?'<input type="checkbox" class="acc-chk"'+(selIds[c.id]?" checked":"")+'>':"")
       +'<div style="flex:1;min-width:0"><div class="acc-t">'+esc((c.titulo||"Sin título").trim())
-      +(c.cliente?' <span class="acc-cli">'+esc(c.cliente)+'</span>':'')+'</div>'
+      +(c.cliente?' <span class="acc-cli">'+esc(c.cliente)+'</span>':'')
+      +' <span class="est" style="color:'+E[2]+';background:'+E[3]+'">'+E[1]+'</span></div>'
       +'<div class="acc-m">'+esc(izq)+' · '+fecha(c.fecha)+' · '+miles(n)+' '+T.pieza+(n===1?"":"s")+'</div>'
       +(r.hit?'<span class="acc-hit">'+esc(r.hit)+'</span>':"")+'</div>'
-      +'<div class="acc-v"><div class="acc-vol">'+fmt(t,T.dec)+' <span>'+T.u+'</span></div>'
+      +'<div class="acc-v"><div class="acc-vol">'+fmt(t,decU(T.u))+' <span>'+T.u+'</span></div>'
       +'<div class="acc-imp'+(imp>0?"":" cero")+'">'+marca+(imp>0?money(imp):"sin precio")+'</div></div></div>';
   }).join("");
 }
 document.getElementById("inBuscar").oninput=function(){ filtro=this.value; renderLista(); };
 function setSelMode(on){ selMode=on; if(!on) selIds={}; renderLista(); }
 document.getElementById("btnSel").onclick=function(){ setSelMode(!selMode); };
+document.getElementById("btnArch").onclick=function(){
+  verArchivo=!verArchivo; selMode=false; selIds={}; activeId=null;
+  filtro=""; document.getElementById("inBuscar").value="";
+  setPane("list"); renderLista(); renderEditor();
+};
+/* archivar o desarchivar sin preguntar: es reversible */
+document.getElementById("btnArchivarSel").onclick=function(){
+  var ids=Object.keys(selIds).filter(function(k){return selIds[k];});
+  if(!ids.length) return;
+  var arch=!verArchivo;
+  DB.cuentas.forEach(function(c){ if(ids.indexOf(c.id)>=0){ c.archivada=arch; c.mod=ahora(); } });
+  save(); setSelMode(false);
+  toast(miles(ids.length)+(arch?" al archivo":" de vuelta a la lista"));
+};
 document.getElementById("btnCancelSel").onclick=function(){ setSelMode(false); };
 document.getElementById("btnTodas").onclick=function(){
   var res=cuentasFiltradas();                       // «Todas» = todas las que estás viendo
@@ -1418,7 +1643,7 @@ document.getElementById("btnBorrarSel").onclick=function(){
   if(!confirm("¿Borrar "+ids.length+" cuenta"+(ids.length===1?"":"s")+"? No se puede deshacer.")) return;
   DB.cuentas=DB.cuentas.filter(function(c){return ids.indexOf(c.id)<0;});
   if(ids.indexOf(activeId)>=0) activeId=null;
-  ajustarContadores(); save(); setSelMode(false); renderEditor(); renderRotulo();
+  save(); setSelMode(false); renderEditor(); renderRotulo();
 };
 
 /* ============================================================
@@ -1551,6 +1776,10 @@ function renderEditor(){
   document.getElementById("lineasBd").scrollTop=0;
   var ti=document.getElementById("inTitulo"); if(ti.value!==(c.titulo||"")) ti.value=c.titulo||"";
   var ci=document.getElementById("inCliente"); if(ci.value!==(c.cliente||"")) ci.value=c.cliente||"";
+  var se=document.getElementById("selEstado"), E=estadoDe(c);
+  se.innerHTML=ESTADOS.map(function(x){
+    return '<option value="'+x[0]+'"'+(x[0]===E[0]?" selected":"")+'>'+x[1]+'</option>';}).join("");
+  se.style.color=E[2]; se.style.background=E[3]; se.style.borderColor=E[2];
   renderMaderaRow(); renderCfg(); renderForm(); renderLineas(); renderTot();
 }
 
@@ -1831,7 +2060,7 @@ function detalleSimple(c){
     if(c.tipo==="rollizo")        s=fmt(l.d1,0)+"/"+fmt(l.d2,0)+" cm x "+fmt(l.L,2)+" m x "+miles(l.cant||1)+" u";
     else if(c.tipo==="escuadria") s=fmt(l.alto,0)+'" x '+fmt(l.ancho,0)+'" x '+fmt(l.L,2)
                                      +" metros x "+miles(l.cant||1)+" unidades";
-    else                          s=fmt(l.esp,0)+'" x '+fmt(l.m2,0)+" m2";
+    else                          s=fmt(l.esp,0)+'" x '+fmt(l.m2,decDe("m2"))+" m2";
     if(l.desc) s+=" - "+l.desc;
     L.push(s);
   });
@@ -1922,10 +2151,10 @@ function armarMensaje(c,agrupado){
     esp=bl.map(function(x){return x.esp+'"';})
           .reduce(function(a,v,i,ar){ return i===0?v:(i===ar.length-1?a+" y "+v:a+", "+v); },"");
     detM2=bl.map(function(x){
-      return 'en '+x.esp+'" espesor:  sup. a cubrir '+fmt(x.m2,0)+' m2'
+      return 'en '+x.esp+'" espesor:  sup. a cubrir '+fmt(x.m2,decDe('m2'))+' m2'
         +(x.precio>0?',  precio '+money0(x.precio)+' x m2':'');
     }).join("\n");
-    m2t=fmt(m2Totales(c),0);
+    m2t=fmt(m2Totales(c),decDe("m2"));
   }
   var dl=num(c.dolarSnap), cobrar=totalACobrar(c);
 
@@ -1941,7 +2170,7 @@ function armarMensaje(c,agrupado){
     "{espesores}": esp,
     "{detallem2}": detM2,
     "{m2total}": m2t,
-    "{total}":   fmt(totalCuenta(c),T.dec),
+    "{total}":   fmt(totalCuenta(c),decU(T.u)),
     "{unidad}":  unidadTxt(T.u),
     "{piezas}":  miles(piezas(c))+" "+T.pieza+(piezas(c)===1?"":"s"),
     "{descuento}": (D&&Math.abs(D.monto)>0.005&&imp>0)
@@ -1978,15 +2207,15 @@ function datosPresupuesto(c){
     var s=c.preciosSnap||{};
     bloquesCelulosa(c).forEach(function(x){
       filas.push({k:x.esp+'" espesor'+(x.precio>0?"  —  "+money0(x.precio)+" / m²":""),
-                  v:fmt(x.m2,0)+" m²"});
+                  v:fmt(x.m2,decDe("m2"))+" m²"});
     });
-    filas.push({k:"TOTAL a cubrir", v:fmt(m2Totales(c),0)+" m²", sub:true});
+    filas.push({k:"TOTAL a cubrir", v:fmt(m2Totales(c),decDe("m2"))+" m²", sub:true});
   }else{
     detalleAgrupado(c).forEach(function(l){
       var ind=/^\s/.test(l);
       filas.push({k:l.trim(), v:"", ind:ind, grupo:!ind});
     });
-    filas.push({k:"Total del pedido", v:fmt(totalCuenta(c),T.dec)+" "+T.u, sub:true});
+    filas.push({k:"Total del pedido", v:fmt(totalCuenta(c),decU(T.u))+" "+T.u, sub:true});
   }
   var tot=[];
   if(imp>0){
@@ -2059,7 +2288,7 @@ function dibujarPresupuesto(c,cb){
       tx=P+lw+34;
     }
     x.fillStyle="#ffffff"; x.font=f(27,800);
-    x.fillText((E.nombre||"Presupuesto").toUpperCase(), tx, logo?hEnc/2-4:74);
+    x.fillText(E.nombre||"Presupuesto", tx, logo?hEnc/2-4:74);
     x.font=f(15,500); x.fillStyle="rgba(255,255,255,.85)";
     (E.datos||"").split("\n").slice(0,2).forEach(function(l,i){
       x.fillText(l, tx, (logo?hEnc/2+30:112)+i*26*S/2*1.4);
@@ -2186,7 +2415,7 @@ document.getElementById("btnDel").onclick=function(){
   var c=cuenta(); if(!c) return;
   if(!confirm('¿Borrar la cuenta "'+(c.titulo||"sin título")+'"? No se puede deshacer.')) return;
   DB.cuentas=DB.cuentas.filter(function(x){return x.id!==c.id;});
-  activeId=null; ajustarContadores(); save();
+  activeId=null; save();
   document.getElementById("cfgPanel").hidden=true;
   document.getElementById("btnCfg").classList.remove("on");
   setPane("list"); renderLista(); renderEditor(); renderRotulo();
@@ -2246,13 +2475,13 @@ function renderLineas(){
     if(c.tipo==="rollizo")       d='<b>'+fmt(l.d1,0)+' / '+fmt(l.d2,0)+'</b> <em>cm</em> × <b>'+fmt(l.L,2)+'</b> <em>m</em>';
     else if(c.tipo==="escuadria")d='<b>'+fmt(l.alto,0)+'" × '+fmt(l.ancho,0)+'"</b> × <b>'+fmt(l.L,2)+'</b> <em>m</em>';
     else{
-      d='<b>'+fmt(l.esp,0)+'"</b> <em>×</em> <b>'+fmt(l.m2,0)+'</b> <em>m²</em>';
+      d='<b>'+fmt(l.esp,0)+'"</b> <em>×</em> <b>'+fmt(l.m2,decDe('m2'))+'</b> <em>m²</em>';
       if(!(num((c.preciosSnap||{})[l.esp])>0)) d+='<span class="sinpr">sin precio</span>';
     }
     if((l.cant||1)>1) d+=' <em>× '+miles(l.cant)+'</em>';
     if(l.desc) d+='<span class="lin-desc">'+esc(l.desc)+'</span>';
     return '<div class="lin"><div class="lin-n">'+(i+1)+'</div><div class="lin-d">'+d+'</div>'
-      +'<div class="lin-v">'+fmt(v,TIPOS[c.tipo].dec)+'</div>'
+      +'<div class="lin-v">'+fmt(v,decU(TIPOS[c.tipo].u))+'</div>'
       +'<button class="lin-x" data-del="'+i+'" aria-label="Borrar">×</button></div>';
   }).join("");
 }
@@ -2279,7 +2508,7 @@ function renderTot(){
   /* en celulosa el número grande son los m² a cubrir; el m³ va en «+ info» */
   if(c.tipo!=="celulosa"){
     h+='<div class="tot-r"><div class="tot-k">TOTAL · '+miles(n)+' '+T.pieza+(n===1?"":"s")+'</div>'
-       +'<div class="tot-v">'+fmt(t,T.dec)+' <small>'+T.u+'</small></div></div>';
+       +'<div class="tot-v">'+fmt(t,decU(T.u))+' <small>'+T.u+'</small></div></div>';
   }
 
   /* verde = coincide con Config · naranja = quedó viejo */
@@ -2296,9 +2525,9 @@ function renderTot(){
       var p=num(s[x.esp]);
       h+='<div class="rec-r"><span>'+x.esp+'″ espesor'
         +(p>0?' <em class="rec-p">— '+money0(p)+' / m²</em>':'')+'</span>'
-        +'<b>'+fmt(x.m2,0)+' m²</b></div>';
+        +'<b>'+fmt(x.m2,decDe('m2'))+' m²</b></div>';
     });
-    h+='<div class="rec-r tot"><span>TOTAL a cubrir</span><b>'+fmt(m2Totales(c),0)+' m²</b></div>';
+    h+='<div class="rec-r tot"><span>TOTAL a cubrir</span><b>'+fmt(m2Totales(c),decDe('m2'))+' m²</b></div>';
 
     if(imp>0){
       var D2=descuentoDe(c), hayD=D2&&Math.abs(D2.monto)>0.005;
@@ -2319,7 +2548,7 @@ function renderTot(){
 
     /* ---------- el resto, adentro de «+ info» ---------- */
     extra+='<div class="tot-r"><div class="tot-k">Volumen · '+miles(n)+' '+T.pieza+(n===1?"":"s")+'</div>'
-      +'<div class="tot-2" style="color:var(--accent)">'+fmt(t,T.dec)+' m³</div></div>';
+      +'<div class="tot-2" style="color:var(--accent)">'+fmt(t,decU(T.u))+' m³</div></div>';
     var precios=dg.filter(function(x){return num(s[x.esp])>0;}).map(function(x){
       var okx=Math.abs(num(s[x.esp])-num(DB.celulosa.precios[x.esp]))<=0.005;
       return val(x.esp+'″ '+money0(num(s[x.esp])),okx);
@@ -2327,7 +2556,7 @@ function renderTot(){
     if(precios) extra+='<div class="tot-r"><div class="tot-k">Precios por m²</div>'
       +'<div class="tot-2" style="font-size:15px">'+precios+'</div></div>';
     if(B){
-      extra+='<div class="tot-r"><div class="tot-k">Bolsas · '+fmt(t,3)+' m³ ÷ '+val(fmt(B.rinde,2)+' m³',okB)
+      extra+='<div class="tot-r"><div class="tot-k">Bolsas · '+fmt(t,decDe("m3"))+' m³ ÷ '+val(fmt(B.rinde,2)+' m³',okB)
         +(c.sistema?' <em style="font-style:normal">('+esc(c.sistema)+')</em>':'')+'</div>'
         +'<div class="tot-2" style="color:var(--accent)">'+miles(B.bolsas)+'</div></div>';
       if(DB.celulosa.mostrarCosto){
@@ -2443,6 +2672,7 @@ document.querySelectorAll(".tab").forEach(function(b){
     tab=b.dataset.tab; document.body.dataset.tab=tab;
     selMode=false; selIds={}; activeId=null;
     filtro=""; document.getElementById("inBuscar").value="";
+    verArchivo=false;
     document.getElementById("cfgPanel").hidden=true;
     document.getElementById("btnCfg").classList.remove("on");
     if(tab==="config"){ document.body.dataset.editing="0"; renderConfig(); return; }
@@ -2496,7 +2726,8 @@ document.getElementById("lineasBd").onclick=function(ev){
   save(); renderLineas(); renderTot(); renderLista();
 };
 document.getElementById("btnNueva").onclick=function(){
-  var n=++DB.contadores[tipo], hoy=new Date(), ts=hoy.toISOString();
+  var n=proximoNum(tipo); DB.contadores[tipo]=n;
+  var hoy=new Date(), ts=hoy.toISOString();
   var c={id:uid(),tipo:tipo,num:n,codigo:prefijoDe(tipo)+n,titulo:rotulo(tipo,n,hoy)+" ",
          fecha:ts,mod:ts,lineas:[]};
   if(TIPOS[tipo].madera){ c.maderaId=(DB.maderas[0]||{}).id; c.metodo="cono"; }
@@ -2511,6 +2742,12 @@ document.getElementById("inTitulo").oninput=function(){
 document.getElementById("inCliente").oninput=function(){
   var c=cuenta(); if(!c) return; c.cliente=this.value; c.mod=ahora(); save(); renderLista();
 };
+document.getElementById("selEstado").onchange=function(){
+  var c=cuenta(); if(!c) return;
+  c.estado=this.value; c.mod=ahora(); save();
+  var E=estadoDe(c); this.style.color=E[2]; this.style.background=E[3]; this.style.borderColor=E[2];
+  renderLista();
+};
 window.addEventListener("resize",function(){ if(!esMobile()&&tab!=="config"&&activeId) setPane("editor"); });
 
 /* ---------- autotest en consola ---------- */
@@ -2524,6 +2761,18 @@ window.addEventListener("resize",function(){ if(!esMobile()&&tab!=="config"&&act
 
 aplicarPaleta();
 document.getElementById("appVer").textContent="v "+APP_VER;
+
+/* al abrir, si está tildado y hay señal, refresca la cotización en segundo plano */
+if(DB.dolarAuto.activo && navigator.onLine!==false){
+  setTimeout(function(){
+    bajarDolar(function(ok,v){
+      if(!ok) return;                                   // sin señal se queda con el valor guardado
+      if(tab==="config") renderDolar();
+      if(activeId) renderCfg();
+      toast("Dólar actualizado: "+money0(v));
+    });
+  },1200);
+}
 document.getElementById("appVer").onclick=buscarActualizacion;
 save();
 if(!esMobile()) setPane("editor");
