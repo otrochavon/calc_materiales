@@ -92,6 +92,12 @@ button{font:inherit}
 .acc-t{font-weight:600;font-size:16.5px;word-break:break-word}
 .est{display:inline-block;border-radius:20px;padding:1px 8px;font-size:11.5px;font-weight:800;
      vertical-align:2px;white-space:nowrap}
+/* chips de estado que se despliegan al tocar el buscador */
+.filtros{flex:none;display:flex;flex-wrap:wrap;gap:6px;padding:8px 10px;background:#fbf8f5;
+         border-bottom:1px solid var(--line)}
+.fchip{border:1px solid var(--line);background:#fff;border-radius:20px;padding:5px 11px;
+       font:inherit;font-size:13px;font-weight:700;cursor:pointer;color:var(--muted);white-space:nowrap}
+.fchip.on{box-shadow:0 0 0 2px currentColor inset}
 .acc-cli{color:var(--accent);font-weight:800}
 .acc-cli::before{content:"· "}
 .acc-m{font-size:13.5px;color:var(--muted);margin-top:2px}
@@ -120,7 +126,10 @@ button{font:inherit}
 .madrow input,.madrow select{min-width:0;border:1px solid #d8c6ae;border-radius:8px;padding:8px;
       font:inherit;background:#fff;color:var(--ink)}
 .madrow #inTitulo{flex:1 1 58%;font-size:16px;font-weight:700}
-.madrow #inCliente{flex:1 1 42%;font-size:15px;font-weight:600}
+.madrow2 #inCliente{flex:1 1 44%;min-width:0;border:1px solid #d8c6ae;border-radius:8px;padding:8px;
+      font:inherit;font-size:15px;font-weight:600;background:#fff;color:var(--ink)}
+.gear.rojo{color:var(--danger);border-color:#e6c9c5}
+.gear.rojo:active{background:var(--danger);color:#fff}
 #selEstado{flex:none;border:1px solid #d8c6ae;border-radius:20px;padding:6px 6px;font:inherit;
            font-size:12.5px;font-weight:800;background:#fff;text-align:center;max-width:104px}
 /* segundo renglón: madera o sistema, más los dos botones */
@@ -419,6 +428,7 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
       <button class="icobtn" id="btnArch" title="Ver el archivo">🗃</button>
       <button class="icobtn" id="btnSel" title="Seleccionar varias">☑</button>
     </div>
+    <div class="filtros" id="filtros" hidden></div>
     <div class="pane-bd" id="listaBd"></div>
     <div class="bar" id="barNormal"><button class="btn wide" id="btnNueva">+ Nueva cuenta</button></div>
     <div class="bar" id="barSel" hidden>
@@ -433,9 +443,11 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
     <div class="madrow" id="madRow">
       <input id="inTitulo" placeholder="Presupuesto" autocomplete="off">
       <select id="selEstado" title="Estado del presupuesto"></select>
-      <input id="inCliente" placeholder="Cliente" autocomplete="off">
+      <button class="gear" id="btnArchivar" title="Archivar">🗃</button>
+      <button class="gear rojo" id="btnDel" title="Borrar esta cuenta">🗑</button>
     </div>
     <div class="madrow2" id="madRow2">
+      <input id="inCliente" placeholder="Cliente" autocomplete="off">
       <select id="selMadera"></select>
       <select id="selSis"></select>
       <button class="gear" id="btnCopy" title="Enviar el pedido al cliente">↗</button>
@@ -444,7 +456,6 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
     <div class="cfgpanel" id="cfgPanel" hidden>
       <div class="cfg" id="cfgGrid"></div>
       <div class="hint" id="cfgHint"></div>
-      <div style="padding:0 12px 10px"><button class="btn danger sm" id="btnDel">Borrar esta cuenta</button></div>
     </div>
     <div class="form" id="formBox"></div>
     <button class="slim" id="btnSlim"><i>+</i> Agregar línea</button>
@@ -580,7 +591,7 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
    cambios grandes (4.0).
    ESTE MISMO NÚMERO va en el VERSION de sw.js. Uno solo, dos archivos.
    ============================================================ */
-var APP_VER="5.0";
+var APP_VER="5.1";
 
 /* ============================================================
    FÓRMULAS
@@ -1549,19 +1560,15 @@ function estadoDe(c){
 }
 
 /* ---------- búsqueda: primero por título, después por descripción ---------- */
-var filtro="";
+var filtro="", filtroEst="";        // texto libre + estado, se combinan
 function norm(s){ return (""+s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
 function cuentasFiltradas(){
   /* la vista de archivo muestra las archivadas; la normal, las demás */
   var cs=delCuentas().filter(function(c){ return !!c.archivada===verArchivo; });
+  if(filtroEst) cs=cs.filter(function(c){ return estadoDe(c)[0]===filtroEst; });
   cs.sort(function(a,b){ return (b.mod||b.fecha).localeCompare(a.mod||a.fecha); });
   var q=norm(filtro).trim();
   if(!q) return cs.map(function(c){ return {c:c,hit:null}; });
-  /* escribir «en curso», «cerrado», etc. filtra por estado */
-  var porEstado=null;
-  ESTADOS.forEach(function(e){ if(norm(e[1]).indexOf(q)===0||norm(e[0]).indexOf(q)===0) porEstado=e[0]; });
-  if(porEstado) return cs.filter(function(c){ return estadoDe(c)[0]===porEstado; })
-                         .map(function(c){ return {c:c,hit:null}; });
   var porTitulo=[], porDesc=[];
   cs.forEach(function(c){
     if(norm(c.titulo||"").indexOf(q)>=0){ porTitulo.push({c:c,hit:null}); return; }
@@ -1579,7 +1586,7 @@ function renderLista(){
   var enArchivo=delCuentas().filter(function(c){ return !!c.archivada; }).length;
   document.getElementById("listaTit").textContent=
     (verArchivo?"Archivo · ":"")+TIPOS[tipo].n+" · "
-    +(filtro.trim()? miles(res.length)+"/"+miles(todas.length) : miles(todas.length));
+    +((filtro.trim()||filtroEst)? miles(res.length)+"/"+miles(todas.length) : miles(todas.length));
   var ba=document.getElementById("btnArch");
   ba.classList.toggle("on",verArchivo);
   ba.title=verArchivo?"Volver a los presupuestos":"Ver el archivo ("+enArchivo+")";
@@ -1614,12 +1621,36 @@ function renderLista(){
       +'<div class="acc-imp'+(imp>0?"":" cero")+'">'+marca+(imp>0?money(imp):"sin precio")+'</div></div></div>';
   }).join("");
 }
+/* al tocar el buscador se despliegan los chips de estado; se combinan con el texto */
+function renderFiltros(){
+  var f=document.getElementById("filtros");
+  f.innerHTML='<button class="fchip'+(filtroEst?"":" on")+'" data-est="" style="color:var(--muted)">todos</button>'
+    +ESTADOS.map(function(e){
+      return '<button class="fchip'+(filtroEst===e[0]?" on":"")+'" data-est="'+e[0]+'" '
+        +'style="color:'+e[2]+';background:'+(filtroEst===e[0]?e[3]:"#fff")+'">'+e[1]+'</button>';}).join("");
+  f.querySelectorAll("[data-est]").forEach(function(b){
+    b.onclick=function(){ filtroEst=b.dataset.est; renderFiltros(); renderLista(); };
+  });
+}
+function verFiltros(v){
+  document.getElementById("filtros").hidden=!v;
+  if(v) renderFiltros();
+}
 document.getElementById("inBuscar").oninput=function(){ filtro=this.value; renderLista(); };
+document.getElementById("inBuscar").onfocus=function(){ verFiltros(true); };
+document.getElementById("inBuscar").onclick=function(){ verFiltros(true); };
+/* se cierra al tocar afuera, salvo que haya un estado elegido */
+document.addEventListener("pointerdown",function(ev){
+  var f=document.getElementById("filtros");
+  if(f.hidden) return;
+  if(ev.target.closest("#filtros")||ev.target.closest("#inBuscar")) return;
+  if(!filtroEst && !filtro.trim()) verFiltros(false);
+});
 function setSelMode(on){ selMode=on; if(!on) selIds={}; renderLista(); }
 document.getElementById("btnSel").onclick=function(){ setSelMode(!selMode); };
 document.getElementById("btnArch").onclick=function(){
   verArchivo=!verArchivo; selMode=false; selIds={}; activeId=null;
-  filtro=""; document.getElementById("inBuscar").value="";
+  filtro=""; document.getElementById("inBuscar").value=""; filtroEst=""; verFiltros(false);
   setPane("list"); renderLista(); renderEditor();
 };
 /* archivar o desarchivar sin preguntar: es reversible */
@@ -1776,6 +1807,9 @@ function renderEditor(){
   document.getElementById("lineasBd").scrollTop=0;
   var ti=document.getElementById("inTitulo"); if(ti.value!==(c.titulo||"")) ti.value=c.titulo||"";
   var ci=document.getElementById("inCliente"); if(ci.value!==(c.cliente||"")) ci.value=c.cliente||"";
+  var ba=document.getElementById("btnArchivar");
+  ba.textContent=c.archivada?"↩":"🗃";
+  ba.title=c.archivada?"Sacar del archivo":"Archivar";
   var se=document.getElementById("selEstado"), E=estadoDe(c);
   se.innerHTML=ESTADOS.map(function(x){
     return '<option value="'+x[0]+'"'+(x[0]===E[0]?" selected":"")+'>'+x[1]+'</option>';}).join("");
@@ -2673,6 +2707,7 @@ document.querySelectorAll(".tab").forEach(function(b){
     selMode=false; selIds={}; activeId=null;
     filtro=""; document.getElementById("inBuscar").value="";
     verArchivo=false;
+    filtroEst=""; verFiltros(false);
     document.getElementById("cfgPanel").hidden=true;
     document.getElementById("btnCfg").classList.remove("on");
     if(tab==="config"){ document.body.dataset.editing="0"; renderConfig(); return; }
@@ -2741,6 +2776,12 @@ document.getElementById("inTitulo").oninput=function(){
 };
 document.getElementById("inCliente").oninput=function(){
   var c=cuenta(); if(!c) return; c.cliente=this.value; c.mod=ahora(); save(); renderLista();
+};
+document.getElementById("btnArchivar").onclick=function(){
+  var c=cuenta(); if(!c) return;
+  c.archivada=!c.archivada; c.mod=ahora(); save();
+  toast(c.archivada?"Archivado":"De vuelta en la lista");
+  activeId=null; setPane("list"); renderLista(); renderEditor();
 };
 document.getElementById("selEstado").onchange=function(){
   var c=cuenta(); if(!c) return;
