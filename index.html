@@ -300,6 +300,22 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
      font:500 14.5px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;resize:vertical}
 .msg:focus{outline:2px solid var(--accent);outline-offset:-2px}
 /* elección de paleta y tipografía */
+/* estados */
+.est-l{display:flex;align-items:center;gap:8px}
+.est-mv{display:flex;flex-direction:column;gap:2px;flex:none}
+.mv{width:26px;height:19px;border:1px solid var(--line);background:#fff;color:var(--muted);
+    border-radius:5px;font-size:10px;line-height:1;cursor:pointer;padding:0}
+.mv:disabled{opacity:.3}
+.e-n{flex:1;min-width:0;border:1px solid var(--line);border-radius:20px;padding:9px 12px;
+     font:inherit;font-size:15.5px;font-weight:800;text-align:center}
+.cols{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.col{width:30px;height:30px;border:2px solid transparent;border-radius:50%;cursor:pointer;padding:0;
+     box-shadow:inset 0 0 0 2px currentColor}
+.col.on{border-color:currentColor;transform:scale(1.12)}
+.est-mover{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.est-mover select{flex:1;min-width:110px;border:1px solid var(--line);border-radius:9px;padding:8px;
+     font:inherit;font-size:15px;background:#fff;color:var(--ink)}
+.est-del{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line)}
 /* redondeo */
 .red-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .red-t{flex:1;min-width:130px}
@@ -489,6 +505,7 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
       <button class="sub chico on" data-sub="empresa">Empresa</button>
       <button class="sub chico" data-sub="mensajes">Mensajes</button>
       <button class="sub chico" data-sub="rotulos">Prefijos</button>
+      <button class="sub chico" data-sub="estados">Estados</button>
     </div>
     <div class="pane-bd">
       <div id="cfgMadera">
@@ -516,6 +533,9 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
       </div>
       <div id="cfgDolar" hidden>
         <div id="dolarBd"></div>
+      </div>
+      <div id="cfgEstados" hidden>
+        <div id="estadosBd"></div>
       </div>
       <div id="cfgRedondeo" hidden>
         <div id="redondeoBd"></div>
@@ -600,7 +620,7 @@ body[data-editing="1"][data-form="off"] .slim{display:flex}
    cambios grandes (4.0).
    ESTE MISMO NÚMERO va en el VERSION de sw.js. Uno solo, dos archivos.
    ============================================================ */
-var APP_VER="5.2";
+var APP_VER="5.3";
 
 /* ============================================================
    FÓRMULAS
@@ -1327,6 +1347,79 @@ function renderDolar(){
   info();
 }
 /* ============================================================
+   CONFIG — estados del presupuesto
+   ============================================================ */
+function usanEstado(id){ return DB.cuentas.filter(function(c){ return estadoDe(c).id===id; }).length; }
+function renderEstados(){
+  document.getElementById("estadosBd").innerHTML=
+    DB.estados.map(function(e,i){
+      var K=colorEst(e), uso=usanEstado(e.id);
+      return '<div class="mad est-r" data-i="'+i+'">'
+        +'<div class="est-l">'
+        +'<div class="est-mv"><button class="mv" data-mv="-1"'+(i===0?" disabled":"")+'>▲</button>'
+        +'<button class="mv" data-mv="1"'+(i===DB.estados.length-1?" disabled":"")+'>▼</button></div>'
+        +'<input class="e-n" value="'+esc(e.n)+'" placeholder="nombre del estado" '
+        +'style="color:'+K[0]+';background:'+K[1]+'">'
+        +'<button class="btn danger sm e-x">✕</button></div>'
+        +'<div class="cols">'+COLORES.map(function(k,ci){
+            return '<button class="col'+(ci===e.c?" on":"")+'" data-c="'+ci+'" title="'+k[2]+'" '
+              +'style="background:'+k[1]+';color:'+k[0]+'"></button>';}).join("")+'</div>'
+        +'<div class="mad-u">'+(i===0?'<b>Arranque</b> · los presupuestos nuevos nacen así. ':'')
+        +'Usado en <b>'+uso+'</b> presupuesto'+(uso===1?"":"s")+'.</div>'
+        +'<div class="est-del" hidden></div></div>';
+    }).join("")
+    +'<div class="padbox"><button class="btn wide" id="btnNuevoEst">+ Agregar estado</button></div>'
+    +'<div class="mad"><div class="mad-u">El <b>primero de la lista</b> es con el que nacen los presupuestos nuevos: '
+    +'movelo con las flechas. Los estados se ven como etiqueta en el listado y se cambian desde cada presupuesto.</div></div>';
+
+  document.querySelectorAll("#estadosBd .est-r").forEach(function(row){
+    var i=+row.dataset.i, e=DB.estados[i];
+    row.querySelector(".e-n").oninput=function(){ e.n=this.value; save(); renderLista(); };
+    row.querySelectorAll("[data-c]").forEach(function(b){
+      b.onclick=function(){
+        e.c=+b.dataset.c; save(); renderEstados(); renderLista();
+        if(activeId) renderEditor();
+      };
+    });
+    row.querySelectorAll("[data-mv]").forEach(function(b){
+      b.onclick=function(){
+        var j=i+(+b.dataset.mv); if(j<0||j>=DB.estados.length) return;
+        var t=DB.estados[i]; DB.estados[i]=DB.estados[j]; DB.estados[j]=t;
+        save(); renderEstados(); renderLista();
+      };
+    });
+    row.querySelector(".e-x").onclick=function(){
+      if(DB.estados.length===1){ alert("Tiene que quedar al menos un estado."); return; }
+      var uso=usanEstado(e.id), caja=row.querySelector(".est-del");
+      if(!uso){ DB.estados.splice(i,1); save(); renderEstados(); renderLista(); toast("Estado borrado"); return; }
+      /* si hay presupuestos usándolo, pregunto a cuál pasarlos */
+      var otros=DB.estados.filter(function(x){ return x.id!==e.id; });
+      caja.hidden=false;
+      caja.innerHTML='<div class="mad-u" style="margin-bottom:7px">Hay <b>'+uso+'</b> presupuesto'
+        +(uso===1?"":"s")+' con este estado. ¿A cuál '+(uso===1?"lo paso":"los paso")+'?</div>'
+        +'<div class="est-mover"><select class="e-dest">'
+        +otros.map(function(x){return '<option value="'+x.id+'">'+esc(x.n)+'</option>';}).join("")
+        +'</select><button class="btn danger sm e-ok">Borrar y pasar</button>'
+        +'<button class="btn ghost sm e-no">Cancelar</button></div>';
+      caja.querySelector(".e-no").onclick=function(){ caja.hidden=true; caja.innerHTML=""; };
+      caja.querySelector(".e-ok").onclick=function(){
+        var dest=caja.querySelector(".e-dest").value;
+        DB.cuentas.forEach(function(c){ if(estadoDe(c).id===e.id){ c.estado=dest; c.mod=ahora(); } });
+        DB.estados.splice(i,1); save(); renderEstados(); renderLista();
+        if(activeId) renderEditor();
+        toast(uso+" pasaron a «"+(DB.estados.filter(function(x){return x.id===dest;})[0]||{}).n+"»");
+      };
+    };
+  });
+  document.getElementById("btnNuevoEst").onclick=function(){
+    var usados={}; DB.estados.forEach(function(x){ usados[x.c]=1; });
+    var libre=0; for(var k=0;k<COLORES.length;k++) if(!usados[k]){ libre=k; break; }
+    DB.estados.push({id:uid(), n:"", c:libre}); save(); renderEstados();
+    var ns=document.querySelectorAll("#estadosBd .e-n"); if(ns.length) ns[ns.length-1].focus();
+  };
+}
+
+/* ============================================================
    CONFIG — redondeo
    ============================================================ */
 var REDON=[["plata","Plata","importes, precios y cotización",3141.5926,function(n,d){return "$ "+n.toLocaleString("es-AR",{minimumFractionDigits:d,maximumFractionDigits:d});}],
@@ -1523,11 +1616,12 @@ function renderSistemas(){
   };
 }
 function renderConfig(){ renderMaderas(); renderCelulosa(); renderBolsa(); renderSistemas(); renderEmpresa();
-  renderMensajes(); renderRotulo(); renderDolar(); renderRedondeo(); renderDatos(); }
+  renderMensajes(); renderRotulo(); renderEstados(); renderDolar(); renderRedondeo(); renderDatos(); }
 /* sub-solapas de Config */
 /* Config en dos niveles: grupo arriba, sección adentro */
 var PANELES={madera:"cfgMadera",celulosa:"cfgCelulosa",dolar:"cfgDolar",redondeo:"cfgRedondeo",
-             empresa:"cfgEmpresa",mensajes:"cfgMensajes",rotulos:"cfgRotulos",datos:"cfgDatos"};
+             empresa:"cfgEmpresa",mensajes:"cfgMensajes",rotulos:"cfgRotulos",estados:"cfgEstados",
+             datos:"cfgDatos"};
 var GRUPOS={precios:{fila:"sub2Precios",def:"madera"},
             person:{fila:"sub2Person",def:"empresa"},
             respaldo:{fila:null,def:"datos"}};
@@ -1557,16 +1651,22 @@ document.querySelectorAll("#config .sub2 .sub").forEach(function(b){
    ============================================================ */
 function selCount(){ return Object.keys(selIds).filter(function(k){return selIds[k];}).length; }
 
-/* ---------- estado del presupuesto ---------- */
-var ESTADOS=[["espera","en espera","#c9901a","#fdf1d8"],
-             ["curso","en curso","#2f7a4f","#e3f1e8"],
-             ["cerrado","cerrado","#6c7076","#e8eaec"],
-             ["cancelado","cancelado","#b5423a","#fbe4e2"]];
-function estadoDe(c){
-  var e=c.estado||"espera";
-  for(var i=0;i<ESTADOS.length;i++) if(ESTADOS[i][0]===e) return ESTADOS[i];
-  return ESTADOS[0];
+/* ---------- estados del presupuesto: se dan de alta y de baja en Config ---------- */
+var COLORES=[["#c9901a","#fdf1d8","amarillo"],["#2f7a4f","#e3f1e8","verde"],
+             ["#6c7076","#e8eaec","gris"],    ["#b5423a","#fbe4e2","rojo"],
+             ["#1f6b8f","#ddeef6","azul"],    ["#6b4b9a","#ece4f7","violeta"],
+             ["#b06a10","#fbe8d2","naranja"], ["#17786e","#d9f0ed","turquesa"]];
+if(!Array.isArray(DB.estados)||!DB.estados.length){
+  DB.estados=[{id:"espera",n:"en espera",c:0},{id:"curso",n:"en curso",c:1},
+              {id:"cerrado",n:"cerrado",c:2},{id:"cancelado",n:"cancelado",c:3}];
 }
+function colorEst(e){ return COLORES[e&&e.c<COLORES.length?e.c:0]||COLORES[0]; }
+function estadoDe(c){
+  var id=c.estado;
+  for(var i=0;i<DB.estados.length;i++) if(DB.estados[i].id===id) return DB.estados[i];
+  return DB.estados[0];                       // el primero manda: es el de arranque
+}
+function estadoDefecto(){ return (DB.estados[0]||{}).id; }
 
 /* ---------- búsqueda: primero por título, después por descripción ---------- */
 var filtro="", filtroEst="";        // texto libre + estado, se combinan
@@ -1574,7 +1674,7 @@ function norm(s){ return (""+s).toLowerCase().normalize("NFD").replace(/[\u0300-
 function cuentasFiltradas(){
   /* la vista de archivo muestra las archivadas; la normal, las demás */
   var cs=delCuentas().filter(function(c){ return !!c.archivada===verArchivo; });
-  if(filtroEst) cs=cs.filter(function(c){ return estadoDe(c)[0]===filtroEst; });
+  if(filtroEst) cs=cs.filter(function(c){ return estadoDe(c).id===filtroEst; });
   cs.sort(function(a,b){ return (b.mod||b.fecha).localeCompare(a.mod||a.fecha); });
   var q=norm(filtro).trim();
   if(!q) return cs.map(function(c){ return {c:c,hit:null}; });
@@ -1623,7 +1723,7 @@ function renderLista(){
       +(selMode?'<input type="checkbox" class="acc-chk"'+(selIds[c.id]?" checked":"")+'>':"")
       +'<div style="flex:1;min-width:0"><div class="acc-t">'+esc((c.titulo||"Sin título").trim())
       +(c.cliente?' <span class="acc-cli">'+esc(c.cliente)+'</span>':'')
-      +' <span class="est" style="color:'+E[2]+';background:'+E[3]+'">'+E[1]+'</span></div>'
+      +' <span class="est" style="color:'+colorEst(E)[0]+';background:'+colorEst(E)[1]+'">'+esc(E.n)+'</span></div>'
       +'<div class="acc-m">'+esc(izq)+' · '+fecha(c.fecha)+' · '+miles(n)+' '+T.pieza+(n===1?"":"s")+'</div>'
       +(r.hit?'<span class="acc-hit">'+esc(r.hit)+'</span>':"")+'</div>'
       +'<div class="acc-v"><div class="acc-vol">'+fmt(t,decU(T.u))+' <span>'+T.u+'</span></div>'
@@ -1634,9 +1734,9 @@ function renderLista(){
 function renderFiltros(){
   var f=document.getElementById("filtros");
   f.innerHTML='<button class="fchip'+(filtroEst?"":" on")+'" data-est="" style="color:var(--muted)">todos</button>'
-    +ESTADOS.map(function(e){
-      return '<button class="fchip'+(filtroEst===e[0]?" on":"")+'" data-est="'+e[0]+'" '
-        +'style="color:'+e[2]+';background:'+(filtroEst===e[0]?e[3]:"#fff")+'">'+e[1]+'</button>';}).join("");
+    +DB.estados.map(function(e){ var K=colorEst(e);
+      return '<button class="fchip'+(filtroEst===e.id?" on":"")+'" data-est="'+e.id+'" '
+        +'style="color:'+K[0]+';background:'+(filtroEst===e.id?K[1]:"#fff")+'">'+esc(e.n)+'</button>';}).join("");
   f.querySelectorAll("[data-est]").forEach(function(b){
     b.onclick=function(){ filtroEst=b.dataset.est; renderFiltros(); renderLista(); };
   });
@@ -1826,9 +1926,9 @@ function renderEditor(){
     +'</svg>';
   ba.title=c.archivada?"Sacar del archivo":"Archivar";
   var se=document.getElementById("selEstado"), E=estadoDe(c);
-  se.innerHTML=ESTADOS.map(function(x){
-    return '<option value="'+x[0]+'"'+(x[0]===E[0]?" selected":"")+'>'+x[1]+'</option>';}).join("");
-  se.style.color=E[2]; se.style.background=E[3]; se.style.borderColor=E[2];
+  se.innerHTML=DB.estados.map(function(x){
+    return '<option value="'+x.id+'"'+(x.id===E.id?" selected":"")+'>'+esc(x.n)+'</option>';}).join("");
+  var K=colorEst(E); se.style.color=K[0]; se.style.background=K[1]; se.style.borderColor=K[0];
   renderMaderaRow(); renderCfg(); renderForm(); renderLineas(); renderTot();
 }
 
@@ -2779,7 +2879,7 @@ document.getElementById("btnNueva").onclick=function(){
   var n=proximoNum(tipo); DB.contadores[tipo]=n;
   var hoy=new Date(), ts=hoy.toISOString();
   var c={id:uid(),tipo:tipo,num:n,codigo:prefijoDe(tipo)+n,titulo:rotulo(tipo,n,hoy)+" ",
-         fecha:ts,mod:ts,lineas:[]};
+         estado:estadoDefecto(), fecha:ts,mod:ts,lineas:[]};
   if(TIPOS[tipo].madera){ c.maderaId=(DB.maderas[0]||{}).id; c.metodo="cono"; }
   congelarPrecio(c);
   DB.cuentas.push(c); activeId=c.id; save();
@@ -2801,7 +2901,7 @@ document.getElementById("btnArchivar").onclick=function(){
 document.getElementById("selEstado").onchange=function(){
   var c=cuenta(); if(!c) return;
   c.estado=this.value; c.mod=ahora(); save();
-  var E=estadoDe(c); this.style.color=E[2]; this.style.background=E[3]; this.style.borderColor=E[2];
+  var K=colorEst(estadoDe(c)); this.style.color=K[0]; this.style.background=K[1]; this.style.borderColor=K[0];
   renderLista();
 };
 window.addEventListener("resize",function(){ if(!esMobile()&&tab!=="config"&&activeId) setPane("editor"); });
